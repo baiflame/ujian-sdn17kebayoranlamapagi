@@ -118,17 +118,13 @@
                 <i data-lucide="lock" class="w-7 h-7"></i>
             </div>
             <h2 class="text-xl font-extrabold text-slate-800 mb-1">Masuk Portal Guru</h2>
-            <p class="text-sm text-slate-500 mb-5">Masukkan PIN Guru untuk mengelola paket soal (25 PG, 10 Isian, 5 Uraian), mencetak PDF, atau mengoreksi jawaban uraian siswa.</p>
+            <p class="text-sm text-slate-500 mb-5">Masukkan PIN Guru untuk mengelola paket soal (25 PG, 10 Isian, 5 Uraian), mengatur izin ujian siswa, mencetak PDF, atau mengoreksi jawaban uraian.</p>
 
             <form onsubmit="handlePinSubmit(event)" class="space-y-4">
                 <div>
                     <label for="pin-input" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">PIN Guru</label>
                     <input type="password" id="pin-input" inputmode="numeric" maxlength="12" required placeholder="••••••"
                         class="w-full rounded-2xl border-2 border-slate-200 focus:border-indigo-500 focus:outline-none px-4 py-3 text-center text-2xl font-extrabold tracking-[0.4em] text-slate-800">
-                    <p class="text-xs text-slate-500 mt-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 flex items-start gap-2">
-                        <i data-lucide="info" class="w-4 h-4 text-indigo-500 shrink-0 mt-0.5"></i>
-                        <span>PIN default: <strong class="text-slate-800 font-mono">123456</strong> (dapat diubah oleh Guru pada tab <strong>Pengaturan Ujian & Bagikan Link</strong>).</span>
-                    </p>
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-2.5 pt-2">
@@ -141,6 +137,37 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal Peringatan Pengawasan Ujian (Pindah Tab / Minimize / Keluar Browser) -->
+    <div id="anticheat-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden items-center justify-center p-4 no-print">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-7 border-2 border-rose-200">
+            <div class="flex items-center gap-3.5 mb-3">
+                <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 animate-bounce">
+                    <i data-lucide="shield-alert" class="w-7 h-7"></i>
+                </div>
+                <div>
+                    <span class="text-[11px] font-extrabold uppercase tracking-wider text-rose-600">Peringatan Pengawasan Ujian</span>
+                    <h3 class="text-lg font-black text-slate-900">Terdeteksi Meninggalkan Layar Ujian!</h3>
+                </div>
+            </div>
+            <p id="anticheat-message" class="text-slate-600 text-sm leading-relaxed mb-4">
+                Kamu terdeteksi membuka tab lain, mengecilkan layar (minimize), atau berpindah jendela saat ujian berlangsung. Apakah kamu ingin langsung mengumpulkan (submit) ujian dan keluar dari portal?
+            </p>
+            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3 text-xs text-amber-900 font-semibold mb-6">
+                Pilih <strong>Tidak</strong> untuk melanjutkan pengerjaan ujian, atau pilih <strong>Ya</strong> untuk otomatis mengumpulkan ujian dan keluar dari portal.
+            </div>
+            <div class="flex flex-col sm:flex-row justify-end gap-2.5">
+                <button type="button" onclick="handleAntiCheatContinue()"
+                    class="flex-1 px-4 py-3 rounded-2xl bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-sm shadow-sm transition">
+                    Tidak, Lanjutkan Ujian
+                </button>
+                <button type="button" onclick="handleAntiCheatSubmitAndExit()"
+                    class="flex-1 px-4 py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-sm shadow-sm transition">
+                    Ya, Submit & Keluar
+                </button>
+            </div>
         </div>
     </div>
 
@@ -296,9 +323,23 @@
 
                     <!-- Form Data Siswa -->
                     <form onsubmit="startStudentExam(event)" class="space-y-4">
+                        <div class="bg-amber-50 border border-amber-300 rounded-2xl p-3.5 flex items-start gap-2.5 text-amber-950">
+                            <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
+                            <div class="text-xs leading-relaxed">
+                                <p class="font-extrabold">Perhatian Penting Sebelum Memulai:</p>
+                                <p class="mt-0.5">Ujian ini <strong>tidak boleh dilakukan dua kali</strong>. Setiap <strong>Nomor Induk Siswa (NIS)</strong> hanya dapat digunakan satu kali untuk mengerjakan ujian, dan dilarang membuka tab lain atau menutup browser selama ujian berlangsung.</p>
+                            </div>
+                        </div>
+
                         <div>
                             <label for="stu-name" class="block text-sm font-bold text-slate-800 mb-1.5">Nama Lengkap Siswa <span class="text-rose-500">*</span></label>
                             <input type="text" id="stu-name" required placeholder="Contoh: Budi Santoso"
+                                class="w-full rounded-2xl border-2 border-slate-200 focus:border-sky-500 focus:outline-none px-4 py-3 text-base font-semibold text-slate-900 bg-slate-50/50 focus:bg-white transition">
+                        </div>
+
+                        <div>
+                            <label for="stu-nis" class="block text-sm font-bold text-slate-800 mb-1.5">Nomor Induk Siswa / Murid (NIS) <span class="text-rose-500">*</span></label>
+                            <input type="text" id="stu-nis" inputmode="numeric" required placeholder="Contoh: 212205014"
                                 class="w-full rounded-2xl border-2 border-slate-200 focus:border-sky-500 focus:outline-none px-4 py-3 text-base font-semibold text-slate-900 bg-slate-50/50 focus:bg-white transition">
                         </div>
 
@@ -482,7 +523,7 @@
                             <button type="button" onclick="retakeStudentExam()"
                                 class="flex-1 py-3 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition flex items-center justify-center gap-2">
                                 <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-                                <span>Siswa Lain / Ulangi</span>
+                                <span>Siswa Lain / Kembali</span>
                             </button>
                         </div>
                     </div>
@@ -1008,6 +1049,61 @@
                     </div>
                 </div>
 
+                <!-- Kewenangan Khusus Guru: Kontrol Akses Ujian & Izin Ujian Ulang (NIS) -->
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-slate-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-11 h-11 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center">
+                                <i data-lucide="user-check" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-lg sm:text-xl font-extrabold text-slate-800">Kewenangan Guru: Batas Ujian & Izin Ulang Siswa (NIS)</h2>
+                                <p class="text-xs text-slate-500">Cegah siswa mengerjakan ujian lebih dari satu kali berdasarkan Nomor Induk Siswa (NIS), atau berikan izin khusus untuk ujian ulang.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-5">
+                        <label class="flex items-start gap-3 bg-amber-50/70 border border-amber-200 p-4 rounded-2xl cursor-pointer">
+                            <input type="checkbox" id="set-prevent-duplicate-nis" onchange="saveTeacherSettingsFromInputs()" checked class="w-4 h-4 mt-0.5 rounded text-indigo-600">
+                            <div class="text-xs sm:text-sm">
+                                <span class="font-extrabold text-slate-900 block">Aktifkan Penguncian 1x Ujian per Nomor Induk Siswa (NIS)</span>
+                                <span class="text-slate-600">Jika aktif, siswa dengan NIS yang sudah menyelesaikan ujian tidak dapat masuk kembali kecuali diizinkan oleh Guru di bawah ini.</span>
+                            </div>
+                        </label>
+
+                        <!-- Form Izinkan NIS Tertentu Ujian Kembali -->
+                        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5">
+                            <h4 class="text-sm font-extrabold text-slate-800 mb-1">Berikan Izin Ujian Ulang (Kewenangan Khusus Guru)</h4>
+                            <p class="text-xs text-slate-500 mb-3">Masukkan Nomor Induk Siswa (NIS) yang mengalami kendala teknis/khusus agar diperbolehkan mengikuti ujian kembali.</p>
+
+                            <form onsubmit="allowRetakeForNis(event)" class="flex flex-col sm:flex-row gap-2.5 mb-4">
+                                <input type="text" id="guru-allow-nis-input" inputmode="numeric" required placeholder="Ketik Nomor Induk Siswa (NIS)..."
+                                    class="flex-1 rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm font-semibold">
+                                <button type="submit"
+                                    class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shrink-0">
+                                    <i data-lucide="unlock" class="w-4 h-4"></i>
+                                    <span>Izinkan NIS Ujian Kembali</span>
+                                </button>
+                            </form>
+
+                            <!-- Daftar NIS yang Sudah Mengikuti Ujian -->
+                            <div class="border-t border-slate-200 pt-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-extrabold text-slate-700">Daftar NIS yang Sudah Tercatat Mengikuti Ujian:</span>
+                                    <button type="button" onclick="confirmResetAllAttemptedNis()"
+                                        class="text-xs font-bold text-rose-600 hover:text-rose-700 underline">
+                                        Reset Semua Kunci NIS
+                                    </button>
+                                </div>
+                                <div id="guru-attempted-nis-list" class="flex flex-wrap gap-2">
+                                    <!-- Diisi oleh JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Keamanan Akun Guru: Ubah PIN & Logout / Kunci Portal -->
                 <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8">
                     <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-slate-100">
@@ -1017,7 +1113,7 @@
                             </div>
                             <div>
                                 <h2 class="text-lg sm:text-xl font-extrabold text-slate-800">Keamanan Akun & PIN Portal Guru</h2>
-                                <p class="text-xs text-slate-500">Ubah PIN akses (default: 123456) atau kunci portal sebelum perangkat diserahkan kepada siswa.</p>
+                                <p class="text-xs text-slate-500">Ubah PIN akses atau kunci portal sebelum perangkat diserahkan kepada siswa.</p>
                             </div>
                         </div>
 
@@ -1129,7 +1225,7 @@
                             <thead>
                                 <tr class="bg-slate-50 border-y border-slate-200 text-xs font-extrabold uppercase text-slate-600">
                                     <th class="py-3 px-3">No</th>
-                                    <th class="py-3 px-3">Nama Siswa</th>
+                                    <th class="py-3 px-3">Nama & NIS Siswa</th>
                                     <th class="py-3 px-3">Kelas / Absen</th>
                                     <th class="py-3 px-3">Skor PG</th>
                                     <th class="py-3 px-3">Skor Isian</th>
@@ -1152,7 +1248,7 @@
     <!-- LOGIKA JAVASCRIPT LENGKAP (3 BAGIAN: PG, ISIAN, URAIAN + PIN SESSION) -->
     <!-- ===================================================================== -->
     <script>
-        // PIN Default Portal Guru (dapat diubah langsung di sini atau via UI Pengaturan PIN)
+        // PIN Default Portal Guru (tidak ditampilkan pada antarmuka publik)
         const DEFAULT_TEACHER_PIN = '123456';
         const AUTH_SESSION_KEY = 'sd5_teacher_auth_session_v2';
 
@@ -1162,7 +1258,9 @@
             QUESTIONS: 'sd5_teacher_questions_v2',
             PIN: 'sd5_teacher_pin_v2',
             GRADEBOOK: 'sd5_teacher_gradebook_v2',
-            STUDENT_PROGRESS: 'sd5_student_exam_progress_v2'
+            STUDENT_PROGRESS: 'sd5_student_exam_progress_v2',
+            ATTEMPTED_NIS: 'sd5_attempted_nis_records_v2',
+            ALLOWED_RETAKE_NIS: 'sd5_allowed_retake_nis_v2'
         };
 
         // Pengaturan Default Ulangan
@@ -1172,7 +1270,8 @@
             subject: 'Tematik Terpadu (Matematika, IPAS, Bahasa Indonesia, PPKn)',
             teacherName: 'Ibu Siti Aminah, S.Pd.',
             duration: 90,
-            showReview: true
+            showReview: true,
+            preventDuplicateNis: true
         };
 
         // State Global Aplikasi
@@ -1183,6 +1282,7 @@
         let gradebook = [];
         let manualImageData = '';
         let activeGradingRowIndex = -1;
+        let isAntiCheatModalOpen = false;
 
         // State Aktif Ujian Siswa
         let activeExamSettings = { ...DEFAULT_SETTINGS };
@@ -1191,6 +1291,7 @@
         let studentSession = {
             active: false,
             name: '',
+            nis: '',
             absen: '',
             studentClass: '5A',
             currentIndex: 0,
@@ -1202,55 +1303,44 @@
         };
 
         // =====================================================================
-        // UTILITAS UMUM (TOAST, KONFIRMASI, ESCAPE HTML, CLIPBOARD, NORMALISASI)
+        // UTILITAS UMUM: SANITASI HTML, IKON LUCIDE, TOAST & KONFIRMASI
         // =====================================================================
+        function escapeHtml(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         function refreshLucideIcons() {
             if (window.lucide && typeof window.lucide.createIcons === 'function') {
                 window.lucide.createIcons();
             }
         }
 
-        function escapeHtml(str) {
-            if (str === null || str === undefined) return '';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
-
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
             if (!container) return;
 
-            const styles = {
+            const styleMap = {
                 success: 'bg-emerald-600 text-white border-emerald-500',
                 error: 'bg-rose-600 text-white border-rose-500',
                 warning: 'bg-amber-500 text-slate-950 border-amber-400',
                 info: 'bg-slate-800 text-white border-slate-700'
             };
-            const icons = {
-                success: 'check-circle-2',
-                error: 'alert-circle',
-                warning: 'alert-triangle',
-                info: 'info'
-            };
 
             const toast = document.createElement('div');
-            toast.className = `pointer-events-auto rounded-2xl border shadow-xl px-4 py-3 text-xs sm:text-sm font-bold flex items-center gap-2.5 transition-all duration-300 ${styles[type] || styles.info}`;
-            toast.innerHTML = `
-                <i data-lucide="${icons[type] || 'info'}" class="w-4 h-4 shrink-0"></i>
-                <span class="flex-1 leading-snug">${escapeHtml(message)}</span>
-            `;
+            toast.className = `pointer-events-auto rounded-2xl border px-4 py-3 shadow-xl text-xs sm:text-sm font-bold flex items-center justify-between gap-3 transition-all duration-300 ${styleMap[type] || styleMap.info}`;
+            toast.innerHTML = `<span>${escapeHtml(message)}</span>`;
             container.appendChild(toast);
-            refreshLucideIcons();
 
             setTimeout(() => {
                 toast.style.opacity = '0';
                 toast.style.transform = 'translateY(-6px)';
                 setTimeout(() => toast.remove(), 300);
-            }, 3400);
+            }, 3800);
         }
 
         function showConfirmDialog(title, message, onConfirm) {
@@ -1258,74 +1348,73 @@
             document.getElementById('confirm-title').textContent = title;
             document.getElementById('confirm-message').textContent = message;
 
+            const okBtn = document.getElementById('confirm-ok');
+            const cancelBtn = document.getElementById('confirm-cancel');
+
+            const closeDialog = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                okBtn.onclick = null;
+                cancelBtn.onclick = null;
+            };
+
+            okBtn.onclick = () => {
+                closeDialog();
+                if (typeof onConfirm === 'function') onConfirm();
+            };
+            cancelBtn.onclick = closeDialog;
+
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             refreshLucideIcons();
-
-            const cancelBtn = document.getElementById('confirm-cancel');
-            const okBtn = document.getElementById('confirm-ok');
-
-            const close = () => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-                cancelBtn.onclick = null;
-                okBtn.onclick = null;
-            };
-
-            cancelBtn.onclick = close;
-            okBtn.onclick = () => {
-                close();
-                if (typeof onConfirm === 'function') onConfirm();
-            };
         }
 
         function copyTextToClipboard(text, successMsg = 'Teks berhasil disalin!') {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
             try {
-                const ta = document.createElement('textarea');
-                ta.value = text;
-                ta.style.position = 'fixed';
-                ta.style.opacity = '0';
-                document.body.appendChild(ta);
-                ta.focus();
-                ta.select();
-                const ok = document.execCommand('copy');
-                document.body.removeChild(ta);
-                if (ok) {
-                    showToast(successMsg, 'success');
-                } else {
-                    showToast('Gagal menyalin otomatis. Silakan salin teks secara manual.', 'warning');
-                }
-            } catch (e) {
-                showToast('Gagal menyalin teks ke clipboard.', 'error');
+                document.execCommand('copy');
+                showToast(successMsg, 'success');
+            } catch (err) {
+                showToast('Gagal menyalin otomatis. Silakan salin secara manual.', 'warning');
             }
+            document.body.removeChild(textarea);
         }
 
-        function normalizeQuestionType(raw) {
-            const val = String(raw || '').trim().toUpperCase();
-            if (val.includes('ISIAN') || val === 'IS' || val === 'SHORT') return 'ISIAN';
-            if (val.includes('URAIAN') || val.includes('ESAI') || val.includes('ESSAY') || val === 'UR') return 'URAIAN';
+        // =====================================================================
+        // NORMALISASI STRUKTUR SOAL & PENYIMPANAN LOCALSTORAGE
+        // =====================================================================
+        function normalizeQuestionType(rawType) {
+            const val = String(rawType || '').trim().toUpperCase();
+            if (val.includes('ISIAN') || val === 'IS' || val === '2') return 'ISIAN';
+            if (val.includes('URAIAN') || val.includes('ESAI') || val === 'UR' || val === '3') return 'URAIAN';
             return 'PG';
         }
 
         function getDefaultWeightByType(type) {
-            if (type === 'PG') return 2;
             if (type === 'ISIAN') return 3;
-            return 4;
+            if (type === 'URAIAN') return 4;
+            return 2;
         }
 
-        function normalizeQuestionObject(q, idx = 0) {
-            const type = normalizeQuestionType(q.type);
-            const weight = Number(q.weight) > 0 ? Number(q.weight) : getDefaultWeightByType(type);
-            const opts = q.options || {};
-            let answer = String(q.answer || '').trim();
+        function normalizeQuestionObject(raw, idx = 0) {
+            const type = normalizeQuestionType(raw.type);
+            const weight = Number(raw.weight) > 0 ? Number(raw.weight) : getDefaultWeightByType(type);
+            const opts = raw.options || {};
+            let answer = String(raw.answer ?? '').trim();
             if (type === 'PG') {
                 const upper = answer.toUpperCase();
                 answer = ['A', 'B', 'C', 'D'].includes(upper) ? upper : 'A';
             }
+
             return {
-                id: q.id || `q_norm_${Date.now()}_${idx}`,
+                id: raw.id || ('q_' + Date.now() + '_' + idx),
                 type,
-                question: String(q.question || '').trim(),
+                question: String(raw.question || '').trim(),
                 options: {
                     A: String(opts.A || '').trim(),
                     B: String(opts.B || '').trim(),
@@ -1334,127 +1423,163 @@
                 },
                 answer,
                 weight,
-                explanation: String(q.explanation || '').trim(),
-                image: String(q.image || '').trim()
+                explanation: String(raw.explanation || '').trim(),
+                image: String(raw.image || '').trim()
             };
         }
 
         function sortQuestionsByOfficialSection(list) {
-            const order = { PG: 1, ISIAN: 2, URAIAN: 3 };
-            return [...list].sort((a, b) => (order[a.type] || 1) - (order[b.type] || 1));
+            const orderMap = { PG: 1, ISIAN: 2, URAIAN: 3 };
+            return [...list].sort((a, b) => (orderMap[a.type] || 1) - (orderMap[b.type] || 1));
+        }
+
+        function saveTeacherSettings() {
+            localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(teacherSettings));
+        }
+
+        function saveTeacherQuestions() {
+            teacherQuestions = sortQuestionsByOfficialSection(teacherQuestions);
+            localStorage.setItem(STORAGE_KEYS.QUESTIONS, JSON.stringify(teacherQuestions));
+        }
+
+        function loadTeacherDataFromStorage() {
+            try {
+                const rawSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+                if (rawSettings) {
+                    teacherSettings = { ...DEFAULT_SETTINGS, ...JSON.parse(rawSettings) };
+                }
+            } catch (e) {
+                teacherSettings = { ...DEFAULT_SETTINGS };
+            }
+
+            try {
+                const rawQuestions = localStorage.getItem(STORAGE_KEYS.QUESTIONS);
+                if (rawQuestions) {
+                    const parsed = JSON.parse(rawQuestions);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        teacherQuestions = sortQuestionsByOfficialSection(
+                            parsed.map((q, idx) => normalizeQuestionObject(q, idx))
+                        );
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.warn('Gagal membaca bank soal lokal, memuat paket bawaan.', e);
+            }
+
+            teacherQuestions = buildFull40SampleQuestions();
+            saveTeacherQuestions();
+        }
+
+        function loadGradebookFromStorage() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEYS.GRADEBOOK);
+                const parsed = raw ? JSON.parse(raw) : [];
+                gradebook = Array.isArray(parsed) ? parsed : [];
+            } catch (e) {
+                gradebook = [];
+            }
+        }
+
+        function saveGradebookToStorage() {
+            localStorage.setItem(STORAGE_KEYS.GRADEBOOK, JSON.stringify(gradebook));
+        }
+
+        function useTeacherExamAsActiveStudentExam(forceReset = false) {
+            if (isLoadedFromSharedLink && !forceReset) return;
+            activeExamSettings = { ...teacherSettings };
+            activeExamQuestions = sortQuestionsByOfficialSection(
+                teacherQuestions.map((q, idx) => normalizeQuestionObject(q, idx))
+            );
+        }
+
+        function getActiveExamSignature() {
+            return `${activeExamSettings.schoolName}|${activeExamSettings.examTitle}|${activeExamQuestions.length}`;
+        }
+
+        function renderStudentHeaderAndSummary() {
+            document.getElementById('student-header-school').textContent = activeExamSettings.schoolName;
+            document.getElementById('student-header-title').textContent = activeExamSettings.examTitle;
+            document.getElementById('student-header-subject').textContent = activeExamSettings.subject;
+
+            const total = activeExamQuestions.length;
+            const pgCount = activeExamQuestions.filter(q => q.type === 'PG').length;
+            const isianCount = activeExamQuestions.filter(q => q.type === 'ISIAN').length;
+            const uraianCount = activeExamQuestions.filter(q => q.type === 'URAIAN').length;
+
+            document.getElementById('student-summary-count').textContent = `${total} Soal`;
+            document.getElementById('student-summary-duration').textContent = `${activeExamSettings.duration} Menit`;
+
+            document.getElementById('student-summary-breakdown').innerHTML = `
+                <div class="bg-white border border-sky-200 rounded-xl p-2">
+                    <span class="block font-extrabold text-sky-800">Pilihan Ganda</span>
+                    <span class="font-black text-slate-900 text-sm">${pgCount} Soal</span>
+                </div>
+                <div class="bg-white border border-teal-200 rounded-xl p-2">
+                    <span class="block font-extrabold text-teal-800">Isian Singkat</span>
+                    <span class="font-black text-slate-900 text-sm">${isianCount} Soal</span>
+                </div>
+                <div class="bg-white border border-amber-200 rounded-xl p-2">
+                    <span class="block font-extrabold text-amber-800">Uraian</span>
+                    <span class="font-black text-slate-900 text-sm">${uraianCount} Soal</span>
+                </div>
+            `;
         }
 
         // =====================================================================
-        // BANK SOAL CONTOH KELAS 5 SD (40 SOAL LENGKAP & 10 SOAL RINGKAS)
+        // PAKET SOAL BAWAAN KELAS 5 SD (40 BUTIR = 100 POIN & 10 RINGKAS)
         // =====================================================================
         function buildFull40SampleQuestions() {
-            const pgData = [
-                { q: 'Hasil dari 3/4 + 1/2 adalah ....', a: '1 1/4', b: '4/6', c: '1 1/2', d: '3/8', k: 'A', e: 'Samakan penyebut menjadi 4: 3/4 + 2/4 = 5/4 = 1 1/4.' },
-                { q: 'Sebuah kubus memiliki panjang rusuk 6 cm. Volume kubus tersebut adalah ....', a: '36 cm³', b: '108 cm³', c: '216 cm³', d: '256 cm³', k: 'C', e: 'Volume kubus = s × s × s = 6 × 6 × 6 = 216 cm³.' },
-                { q: 'Organ pernapasan utama pada manusia tempat terjadinya pertukaran oksigen dan karbon dioksida adalah ....', a: 'Trakea', b: 'Bronkus', c: 'Alveolus di paru-paru', d: 'Rongga hidung', k: 'C', e: 'Alveolus merupakan gelembung halus di paru-paru tempat pertukaran O2 dan CO2.' },
-                { q: 'Perpindahan panas melalui zat perantara tanpa disertai perpindahan partikel zat tersebut disebut ....', a: 'Konveksi', b: 'Konduksi', c: 'Radiasi', d: 'Evaporasi', k: 'B', e: 'Konduksi adalah perpindahan kalor secara merambat pada benda padat (contohnya sendok logam yang dipanaskan).' },
-                { q: 'Ide pokok sebuah paragraf biasanya terdapat pada ....', a: 'Kalimat penjelas', b: 'Kalimat utama', c: 'Judul bacaan saja', d: 'Akhir cerita', k: 'B', e: 'Kalimat utama memuat gagasan pokok yang dijelaskan oleh kalimat-kalimat penjelas.' },
-                { q: 'Kata tanya yang digunakan untuk menanyakan alasan atau sebab terjadinya suatu peristiwa adalah ....', a: 'Kapan', b: 'Di mana', c: 'Mengapa', d: 'Berapa', k: 'C', e: 'Kata tanya "Mengapa" menanyakan sebab atau alasan.' },
-                { q: 'Lambang sila keempat Pancasila yang berbunyi "Kerakyatan yang dipimpin oleh hikmat kebijaksanaan dalam permusyawaratan/perwakilan" adalah ....', a: 'Bintang emas', b: 'Rantai baja', c: 'Pohon beringin', d: 'Kepala banteng', k: 'D', e: 'Kepala banteng melambangkan musyawarah dan gotong royong dalam mengambil keputusan.' },
-                { q: 'Jarak kota A ke kota B adalah 120 km. Sebuah mobil menempuhnya dalam waktu 2 jam. Kecepatan rata-rata mobil tersebut adalah ....', a: '40 km/jam', b: '50 km/jam', c: '60 km/jam', d: '80 km/jam', k: 'C', e: 'Kecepatan = Jarak : Waktu = 120 km : 2 jam = 60 km/jam.' },
-                { q: 'Bentuk desimal dari pecahan 3/5 adalah ....', a: '0,3', b: '0,5', c: '0,6', d: '0,75', k: 'C', e: '3/5 = 6/10 = 0,6.' },
-                { q: 'Proses jatuhnya titik-titik air dari awan ke permukaan bumi dalam siklus air disebut ....', a: 'Evaporasi', b: 'Kondensasi', c: 'Presipitasi', d: 'Infiltrasi', k: 'C', e: 'Presipitasi adalah peristiwa turunnya hujan dari awan ke permukaan bumi.' },
-                { q: 'Simbiosis antara burung jalak yang memakan kutu di punggung kerbau termasuk simbiosis ....', a: 'Parasitisme', b: 'Komensalisme', c: 'Mutualisme', d: 'Amensalisme', k: 'C', e: 'Keduanya saling diuntungkan: jalak mendapat makanan, kerbau terbebas dari kutu.' },
-                { q: 'Pantun yang berisi nasihat dan ajaran kebaikan disebut pantun ....', a: 'Jenaka', b: 'Teka-teki', c: 'Nasihat', d: 'Kiasan', k: 'C', e: 'Pantun nasihat berisi pesan moral atau anjuran berbuat baik.' },
-                { q: 'Hasil dari 2,5 × 4 adalah ....', a: '8', b: '9,5', c: '10', d: '12', k: 'C', e: '2,5 × 4 = 10,0 = 10.' },
-                { q: 'Balok dengan panjang 10 cm, lebar 5 cm, dan tinggi 4 cm memiliki volume sebesar ....', a: '100 cm³', b: '150 cm³', c: '200 cm³', d: '250 cm³', k: 'C', e: 'Volume balok = p × l × t = 10 × 5 × 4 = 200 cm³.' },
-                { q: 'Perubahan wujud benda dari gas menjadi cair seperti munculnya titik embun di pagi hari disebut ....', a: 'Menguap', b: 'Mengembun', c: 'Menyublim', d: 'Membeku', k: 'B', e: 'Mengembun adalah perubahan wujud gas (uap air) menjadi titik-titik air.' },
-                { q: 'Sebagian besar wilayah Indonesia berupa perairan sehingga Indonesia dijuluki sebagai negara ....', a: 'Agraris', b: 'Maritim', c: 'Industri', d: 'Kontinental', k: 'B', e: 'Negara maritim adalah negara yang memiliki wilayah laut sangat luas.' },
-                { q: 'Sinonim dari kata "rajin" adalah ....', a: 'Malas', b: 'Giat', c: 'Lamban', d: 'Lalai', k: 'B', e: 'Sinonim (persamaan kata) dari rajin adalah giat atau tekun.' },
-                { q: 'Musyawarah di kelas untuk menentukan jadwal piket merupakan pengamalan Pancasila sila ke-....', a: 'Satu', b: 'Dua', c: 'Tiga', d: 'Empat', k: 'D', e: 'Musyawarah mufakat merupakan nilai utama sila keempat Pancasila.' },
-                { q: 'Skala pada peta tertulis 1 : 500.000. Jika jarak dua kota pada peta 4 cm, jarak sebenarnya adalah ....', a: '2 km', b: '20 km', c: '200 km', d: '50 km', k: 'B', e: 'Jarak sebenarnya = 4 × 500.000 cm = 2.000.000 cm = 20 km.' },
-                { q: 'Bagian darah yang berfungsi mengedarkan oksigen ke seluruh tubuh adalah ....', a: 'Sel darah putih', b: 'Keping darah', c: 'Sel darah merah', d: 'Plasma darah', k: 'C', e: 'Sel darah merah mengandung hemoglobin yang mengikat oksigen.' },
-                { q: 'Contoh sumber daya alam yang dapat diperbarui adalah ....', a: 'Minyak bumi', b: 'Batu bara', c: 'Air dan tumbuhan', d: 'Gas alam', k: 'C', e: 'Air, tumbuhan, hewan, dan sinar matahari dapat diperbarui secara alami.' },
-                { q: 'Kalimat berikut yang merupakan kalimat efektif adalah ....', a: 'Para siswa-siswa sedang belajar di kelas.', b: 'Para siswa sedang belajar di kelas.', c: 'Banyak anak-anak bermain bola.', d: 'Semua murid-murid berbaris rapi.', k: 'B', e: 'Kata "para" sudah bermakna jamak sehingga tidak perlu diulang menjadi "siswa-siswa".' },
-                { q: 'Keberagaman suku bangsa dan budaya di Indonesia harus disikapi dengan rasa ....', a: 'Sombong', b: 'Toleransi dan saling menghormati', c: 'Acuh tak acuh', d: 'Iri hati', k: 'B', e: 'Toleransi menjaga persatuan bangsa sesuai semboyan Bhinneka Tunggal Ika.' },
-                { q: 'Hasil dari 45% + 0,25 dalam bentuk desimal adalah ....', a: '0,60', b: '0,65', c: '0,70', d: '0,75', k: 'C', e: '45% = 0,45; maka 0,45 + 0,25 = 0,70.' },
-                { q: 'Organ pencernaan manusia yang berfungsi menyerap sari-sari makanan adalah ....', a: 'Kerongkongan', b: 'Lambung', c: 'Usus halus', d: 'Usus besar', k: 'C', e: 'Usus halus menyerap sari makanan, sedangkan usus besar menyerap air dan sisa pencernaan.' }
-            ];
+            const pgItems = [
+                { question: 'Hasil dari 3/4 + 2/5 adalah ....', options: { A: '5/9', B: '23/20', C: '11/20', D: '6/20' }, answer: 'B', explanation: 'Samakan penyebut menjadi 20: 15/20 + 8/20 = 23/20.' },
+                { question: 'Sebuah balok memiliki panjang 12 cm, lebar 5 cm, dan tinggi 4 cm. Volume balok tersebut adalah ....', options: { A: '21 cm³', B: '120 cm³', C: '240 cm³', D: '300 cm³' }, answer: 'C', explanation: 'Volume balok = p × l × t = 12 × 5 × 4 = 240 cm³.' },
+                { question: 'Bentuk desimal dari pecahan 3/8 adalah ....', options: { A: '0,25', B: '0,35', C: '0,375', D: '0,425' }, answer: 'C', explanation: '3 dibagi 8 sama dengan 0,375.' },
+                { question: 'Keliling sebuah persegi yang memiliki panjang sisi 17 cm adalah ....', options: { A: '34 cm', B: '51 cm', C: '68 cm', D: '289 cm' }, answer: 'C', explanation: 'Keliling persegi = 4 × sisi = 4 × 17 = 68 cm.' },
+                { question: 'Perbandingan umur Ayah dan Budi adalah 7 : 2. Jika umur Budi 10 tahun, maka umur Ayah adalah ....', options: { A: '25 tahun', B: '30 tahun', C: '35 tahun', D: '40 tahun' }, answer: 'C', explanation: 'Umur Ayah = (7/2) × 10 = 35 tahun.' },
+                { question: 'Hasil dari 2,5 × 1,4 adalah ....', options: { A: '3,5', B: '3,9', C: '4,2', D: '2,9' }, answer: 'A', explanation: '25 × 14 = 350, dengan dua angka di belakang koma menjadi 3,50 = 3,5.' },
+                { question: 'Organ pernapasan utama pada ikan adalah ....', options: { A: 'Paru-paru', B: 'Trakea', C: 'Insang', D: 'Kulit' }, answer: 'C', explanation: 'Ikan bernapas menggunakan insang untuk menyerap oksigen terlarut di air.' },
+                { question: 'Perubahan wujud benda dari gas menjadi cair disebut ....', options: { A: 'Menguap', B: 'Mengembun', C: 'Menyublim', D: 'Membeku' }, answer: 'B', explanation: 'Mengembun adalah perubahan wujud dari gas menjadi cair, contohnya titik embun pagi hari.' },
+                { question: 'Dalam rantai makanan di sawah, ular berperan sebagai ....', options: { A: 'Produsen', B: 'Konsumen tingkat I', C: 'Konsumen tingkat II', D: 'Pengurai' }, answer: 'C', explanation: 'Padi (produsen) -> Tikus (konsumen I) -> Ular (konsumen II).' },
+                { question: 'Bagian mata yang berfungsi mengatur banyak sedikitnya cahaya yang masuk adalah ....', options: { A: 'Retina', B: 'Pupil', C: 'Kornea', D: 'Sklera' }, answer: 'B', explanation: 'Pupil mengecil saat cahaya terang dan membesar saat cahaya redup.' },
+                { question: 'Perpindahan panas melalui zat perantara tanpa diikuti perpindahan partikel zatnya disebut ....', options: { A: 'Konduksi', B: 'Konveksi', C: 'Radiasi', D: 'Evaporasi' }, answer: 'A', explanation: 'Konduksi terjadi pada benda padat seperti logam yang dipanaskan.' },
+                { question: 'Simbiosis antara lebah dan bunga merupakan contoh simbiosis ....', options: { A: 'Parasitisme', B: 'Komensalisme', C: 'Mutualisme', D: 'Amensalisme' }, answer: 'C', explanation: 'Keduanya saling menguntungkan: lebah mendapat nektar dan bunga terbantu penyerbukannya.' },
+                { question: 'Kalimat utama yang terletak di awal paragraf disebut paragraf ....', options: { A: 'Induktif', B: 'Deduktif', C: 'Campuran', D: 'Naratif' }, answer: 'B', explanation: 'Paragraf deduktif memiliki gagasan utama di awal paragraf.' },
+                { question: 'Kata tanya yang digunakan untuk menanyakan sebab terjadinya suatu peristiwa adalah ....', options: { A: 'Di mana', B: 'Kapan', C: 'Mengapa', D: 'Siapa' }, answer: 'C', explanation: 'Kata tanya "mengapa" digunakan untuk menanyakan alasan atau sebab.' },
+                { question: 'Sinonim dari kata "rajin" adalah ....', options: { A: 'Malas', B: 'Giat', C: 'Lambat', D: 'Ceroboh' }, answer: 'B', explanation: 'Sinonim (persamaan kata) dari rajin adalah giat atau tekun.' },
+                { question: 'Majas yang mengumpamakan benda mati seolah-olah hidup seperti manusia disebut majas ....', options: { A: 'Hiperbola', B: 'Metafora', C: 'Personifikasi', D: 'Simile' }, answer: 'C', explanation: 'Contoh personifikasi: Angin berbisik lembut di telingaku.' },
+                { question: 'Penulisan huruf kapital yang tepat di bawah ini adalah ....', options: { A: 'Siti pergi ke pulau bali.', B: 'Siti pergi ke Pulau Bali.', C: 'siti pergi ke Pulau bali.', D: 'Siti Pergi Ke Pulau Bali.' }, answer: 'B', explanation: 'Huruf kapital digunakan pada awal kalimat serta nama diri geografis (Pulau Bali).' },
+                { question: 'Pantun yang berisi nasihat dan petuah bijak disebut pantun ....', options: { A: 'Jenaka', B: 'Teka-teki', C: 'Nasihat', D: 'Anak-anak' }, answer: 'C', explanation: 'Pantun nasihat bertujuan mendidik dan memberikan pesan moral.' },
+                { question: 'Musyawarah untuk mencapai mufakat merupakan pengamalan Pancasila sila ke- ....', options: { A: 'Dua', B: 'Tiga', C: 'Empat', D: 'Lima' }, answer: 'C', explanation: 'Sila keempat berbunyi Kerakyatan yang dipimpin oleh hikmat kebijaksanaan dalam permusyawaratan/perwakilan.' },
+                { question: 'Semboyan bangsa Indonesia yang tertulis pada pita burung Garuda Pancasila adalah ....', options: { A: 'Tut Wuri Handayani', B: 'Bhinneka Tunggal Ika', C: 'Ing Ngarsa Sung Tuladha', D: 'Bersatu Kita Teguh' }, answer: 'B', explanation: 'Bhinneka Tunggal Ika berarti berbeda-beda tetapi tetap satu jua.' },
+                { question: 'Menjaga kebersihan lingkungan sekolah merupakan contoh ... setiap warga sekolah.', options: { A: 'Hak', B: 'Kewajiban', C: 'Hadiah', D: 'Keinginan' }, answer: 'B', explanation: 'Kewajiban adalah segala sesuatu yang harus dilaksanakan dengan penuh tanggung jawab.' },
+                { question: 'Keragaman rumah adat dan tarian daerah di Indonesia harus kita sikapi dengan rasa ....', options: { A: 'Sombong', B: 'Bangga dan saling menghormati', C: 'Acuh tak acuh', D: 'Iri hati' }, answer: 'B', explanation: 'Keragaman budaya adalah kekayaan bangsa yang mempererat persatuan.' },
+                { question: 'Letak geografis Indonesia berada di antara dua benua, yaitu Benua Asia dan Benua ....', options: { A: 'Eropa', B: 'Afrika', C: 'Australia', D: 'Amerika' }, answer: 'C', explanation: 'Secara geografis Indonesia diapit Benua Asia dan Australia serta Samudra Hindia dan Pasifik.' },
+                { question: 'Kegiatan menyalurkan barang dari produsen kepada konsumen disebut ....', options: { A: 'Produksi', B: 'Distribusi', C: 'Konsumsi', D: 'Investasi' }, answer: 'B', explanation: 'Pelaku kegiatan penyaluran barang disebut distributor.' },
+                { question: 'Kerajaan Hindu tertua di Indonesia yang terletak di Kalimantan Timur adalah Kerajaan ....', options: { A: 'Majapahit', B: 'Sriwijaya', C: 'Kutai', D: 'Tarumanegara' }, answer: 'C', explanation: 'Kerajaan Kutai berdiri sekitar abad ke-4 Masehi dengan raja terkenal Mulawarman.' }
+            ].map((item, idx) => normalizeQuestionObject({ ...item, id: 'def_pg_' + idx, type: 'PG', weight: 2 }, idx));
 
-            const isianData = [
-                { q: 'Hasil dari 2/3 × 9 adalah ....', k: '6', e: '(2 × 9) / 3 = 18 / 3 = 6.' },
-                { q: 'Bangun ruang yang memiliki 6 sisi berbentuk persegi sama luas disebut ....', k: 'kubus', e: 'Kubus memiliki 6 sisi persegi kongruen, 12 rusuk, dan 8 titik sudut.' },
-                { q: 'Hewan yang memakan tumbuhan saja disebut hewan ....', k: 'herbivora|herbivor', e: 'Herbivora adalah kelompok hewan pemakan tumbuhan seperti sapi dan kambing.' },
-                { q: 'Panas matahari sampai ke bumi melalui perpindahan kalor secara ....', k: 'radiasi', e: 'Radiasi adalah perpindahan panas tanpa melalui zat perantara.' },
-                { q: 'Semboyan bangsa Indonesia yang tertulis pada pita burung Garuda Pancasila adalah ....', k: 'Bhinneka Tunggal Ika|Bhineka Tunggal Ika', e: 'Bhinneka Tunggal Ika berarti berbeda-beda tetapi tetap satu jua.' },
-                { q: 'Antonim (lawan kata) dari kata "hemat" adalah ....', k: 'boros', e: 'Lawan kata hemat adalah boros.' },
-                { q: 'Sebuah jam menunjukkan waktu pukul 07.30. Jika lama perjalanan ke sekolah 25 menit, maka tiba di sekolah pukul ....', k: '07.55|7.55', e: '07.30 + 25 menit = 07.55.' },
-                { q: 'Alat pernapasan pada ikan yang hidup di air adalah ....', k: 'insang', e: 'Ikan bernapas menggunakan insang untuk menyaring oksigen terlarut dalam air.' },
-                { q: 'Teks yang dibuat berdasarkan fakta dan kenyataan disebut teks ....', k: 'nonfiksi|non fiksi', e: 'Teks nonfiksi disusun berdasarkan data atau fakta nyata.' },
-                { q: 'Pencipta lagu kebangsaan Indonesia Raya adalah ....', k: 'W.R. Supratman|WR Supratman|Wage Rudolf Supratman', e: 'Lagu Indonesia Raya diciptakan oleh Wage Rudolf Supratman.' }
-            ];
+            const isianItems = [
+                { question: 'Hasil dari 25% dari 200 adalah ....', answer: '50', explanation: '25/100 × 200 = 50.' },
+                { question: 'Bangun ruang kubus memiliki jumlah rusuk sebanyak ... buah.', answer: '12|dua belas', explanation: 'Kubus memiliki 12 rusuk sama panjang, 6 sisi, dan 8 titik sudut.' },
+                { question: 'Proses tumbuhan hijau membuat makanannya sendiri dengan bantuan cahaya matahari disebut ....', answer: 'fotosintesis', explanation: 'Fotosintesis terjadi terutama pada daun yang mengandung klorofil.' },
+                { question: 'Alat peredaran darah manusia yang berfungsi memompa darah ke seluruh tubuh adalah ....', answer: 'jantung', explanation: 'Jantung memiliki empat ruang: serambi kanan/kiri dan bilik kanan/kiri.' },
+                { question: 'Sumber energi panas terbesar bagi kehidupan di Bumi adalah ....', answer: 'matahari', explanation: 'Matahari memancarkan energi panas dan cahaya secara radiasi.' },
+                { question: 'Antonim (lawan kata) dari kata "hemat" adalah ....', answer: 'boros', explanation: 'Lawan kata hemat adalah boros.' },
+                { question: 'Bagian surat resmi yang berisi alamat dan nama instansi pengirim di bagian paling atas disebut ....', answer: 'kop surat|kepala surat', explanation: 'Kop surat berada di bagian paling atas surat resmi.' },
+                { question: 'Lambang sila kelima Pancasila adalah padi dan ....', answer: 'kapas', explanation: 'Padi dan kapas melambangkan kebutuhan pokok sandang dan pangan.' },
+                { question: 'Garis khayal yang membelah Bumi menjadi belahan utara dan selatan serta melewati Kota Pontianak disebut garis ....', answer: 'khatulistiwa|ekuator', explanation: 'Garis khatulistiwa berada pada lintang 0 derajat.' },
+                { question: 'Bapak Proklamator kemerdekaan Indonesia adalah Ir. Soekarno dan Drs. ....', answer: 'Mohammad Hatta|Moh. Hatta|Hatta', explanation: 'Soekarno-Hatta membacakan teks Proklamasi pada 17 Agustus 1945.' }
+            ].map((item, idx) => normalizeQuestionObject({ ...item, id: 'def_is_' + idx, type: 'ISIAN', weight: 3 }, 25 + idx));
 
-            const uraianData = [
-                {
-                    q: 'Sebuah akuarium berbentuk balok memiliki panjang 50 cm, lebar 30 cm, dan tinggi 40 cm. Berapa liter volume air jika akuarium diisi penuh? (1 liter = 1.000 cm³)',
-                    k: 'Diketahui p = 50 cm, l = 30 cm, t = 40 cm. Volume = 50 × 30 × 40 = 60.000 cm³. Diubah ke liter: 60.000 : 1.000 = 60 liter.',
-                    e: 'Gunakan rumus V = p × l × t lalu bagi 1.000 untuk mengubah cm³ menjadi liter.'
-                },
-                {
-                    q: 'Jelaskan 3 cara menjaga kesehatan organ pernapasan manusia dalam kehidupan sehari-hari!',
-                    k: '1) Menghindari asap rokok dan polusi udara / memakai masker saat berdebu; 2) Rutin berolahraga; 3) Makan makanan bergizi dan menanam tumbuhan hijau di sekitar rumah.',
-                    e: 'Menyebutkan 3 upaya nyata menjaga kesehatan paru-paru dan saluran napas.'
-                },
-                {
-                    q: 'Sebutkan dan jelaskan secara singkat 3 tahapan utama dalam siklus air di bumi!',
-                    k: '1) Evaporasi (penguapan air laut/sungai karena panas matahari); 2) Kondensasi (pengembunan uap air menjadi awan); 3) Presipitasi (turunnya titik air awan menjadi hujan).',
-                    e: 'Tiga tahapan utama siklus hidrologi: evaporasi, kondensasi, dan presipitasi.'
-                },
-                {
-                    q: 'Tuliskan 3 contoh sikap yang mencerminkan persatuan dan kesatuan di lingkungan sekolah!',
-                    k: '1) Melaksanakan piket kelas bersama-sama; 2) Berteman tanpa membeda-bedakan suku atau agama; 3) Bekerja sama saat kerja kelompok dan menjenguk teman yang sakit.',
-                    e: 'Mencerminkan pengamalan sila ketiga Pancasila di sekolah.'
-                },
-                {
-                    q: 'Bacalah kutipan berikut: "Hutan bakau di pesisir pantai sangat bermanfaat untuk menahan abrasi gelombang laut serta menjadi tempat hidup berbagai jenis ikan dan kepiting." Tuliskan ide pokok paragraf tersebut!',
-                    k: 'Ide pokok paragraf tersebut adalah manfaat hutan bakau di pesisir pantai (untuk menahan abrasi dan menjadi habitat hewan laut).',
-                    e: 'Ide pokok merangkum inti kalimat utama pada awal paragraf.'
-                }
-            ];
+            const uraianItems = [
+                { question: 'Ibu membeli 2 1/2 kg gula pasir dan 1 3/4 kg tepung terigu. Berapa kilogram berat seluruh belanjaan Ibu? Tuliskan langkah penyelesaiannya!', answer: '2 1/2 + 1 3/4 = 5/2 + 7/4 = 10/4 + 7/4 = 17/4 = 4 1/4 kg (atau 4,25 kg).', explanation: 'Ubah ke pecahan biasa atau samakan penyebutnya menjadi perempat.' },
+                { question: 'Jelaskan 3 tahapan siklus air (daur air) secara urut beserta pengertian singkatnya!', answer: '1. Evaporasi (penguapan air laut/sungai oleh panas matahari), 2. Kondensasi (pengembunan uap air menjadi awan), 3. Presipitasi (turunnya titik-titik air hujan ke permukaan Bumi).', explanation: 'Siklus air menjaga ketersediaan air bersih di Bumi.' },
+                { question: 'Buatlah satu bait pantun nasihat tentang pentingnya rajin belajar!', answer: 'Terdiri dari 4 baris, bersajak a-b-a-b, baris 1-2 sampiran, dan baris 3-4 berisi pesan/nasihat rajin belajar.', explanation: 'Perhatikan rima akhir baris 1 sama dengan 3, dan baris 2 sama dengan 4.' },
+                { question: 'Sebutkan 3 contoh sikap menghargai keragaman budaya di lingkungan sekolah!', answer: '1. Berteman tanpa membeda-bedakan suku dan agama, 2. Menghormati teman yang sedang beribadah, 3. Mempelajari dan mengapresiasi tarian atau lagu daerah lain.', explanation: 'Sikap toleransi menciptakan kerukunan di sekolah.' },
+                { question: 'Mengapa Indonesia dikenal sebagai negara maritim sekaligus negara agraris? Jelaskan alasanmu!', answer: 'Disebut negara maritim karena sebagian besar wilayah Indonesia berupa perairan/lautan yang luas, dan disebut negara agraris karena sebagian besar penduduknya bermata pencaharian di bidang pertanian dengan tanah yang subur.', explanation: 'Letak geografis dan iklim tropis mendukung sektor kelautan dan pertanian.' }
+            ].map((item, idx) => normalizeQuestionObject({ ...item, id: 'def_ur_' + idx, type: 'URAIAN', weight: 4 }, 35 + idx));
 
-            const result = [];
-            pgData.forEach((item, idx) => {
-                result.push({
-                    id: `std_pg_${idx + 1}`,
-                    type: 'PG',
-                    question: item.q,
-                    options: { A: item.a, B: item.b, C: item.c, D: item.d },
-                    answer: item.k,
-                    weight: 2,
-                    explanation: item.e,
-                    image: ''
-                });
-            });
-            isianData.forEach((item, idx) => {
-                result.push({
-                    id: `std_is_${idx + 1}`,
-                    type: 'ISIAN',
-                    question: item.q,
-                    options: { A: '', B: '', C: '', D: '' },
-                    answer: item.k,
-                    weight: 3,
-                    explanation: item.e,
-                    image: ''
-                });
-            });
-            uraianData.forEach((item, idx) => {
-                result.push({
-                    id: `std_ur_${idx + 1}`,
-                    type: 'URAIAN',
-                    question: item.q,
-                    options: { A: '', B: '', C: '', D: '' },
-                    answer: item.k,
-                    weight: 4,
-                    explanation: item.e,
-                    image: ''
-                });
-            });
-            return result;
+            return [...pgItems, ...isianItems, ...uraianItems];
         }
 
         function buildStarter10SampleQuestions() {
@@ -1467,192 +1592,90 @@
         }
 
         // =====================================================================
-        // INISIALISASI APLIKASI SAAT HALAMAN DIBUKA
+        // INISIALISASI HALAMAN (WINDOW ONLOAD)
         // =====================================================================
         window.onload = function() {
             isTeacherAuthenticated = sessionStorage.getItem(AUTH_SESSION_KEY) === '1';
             loadTeacherDataFromStorage();
             loadGradebookFromStorage();
             setupExcelDragAndDrop();
+            setupStudentAntiCheatListeners();
 
             const params = new URLSearchParams(window.location.search);
             const sharedExamParam = params.get('ujian');
             const modeParam = params.get('mode');
 
             if (sharedExamParam) {
-                const loaded = loadExamFromSharedUrl(sharedExamParam);
-                if (!loaded) {
+                try {
+                    const decompressed = LZString.decompressFromEncodedURIComponent(sharedExamParam);
+                    if (decompressed) {
+                        const payload = JSON.parse(decompressed);
+                        isLoadedFromSharedLink = true;
+                        activeExamSettings = {
+                            schoolName: payload.s || DEFAULT_SETTINGS.schoolName,
+                            examTitle: payload.t || DEFAULT_SETTINGS.examTitle,
+                            subject: payload.m || DEFAULT_SETTINGS.subject,
+                            teacherName: payload.g || DEFAULT_SETTINGS.teacherName,
+                            duration: Number(payload.d) || 90,
+                            showReview: payload.r === undefined ? true : Boolean(payload.r),
+                            preventDuplicateNis: payload.p === undefined ? true : Boolean(payload.p)
+                        };
+                        const typeDecode = { 1: 'PG', 2: 'ISIAN', 3: 'URAIAN' };
+                        const rawList = Array.isArray(payload.q) ? payload.q : [];
+                        activeExamQuestions = sortQuestionsByOfficialSection(
+                            rawList.map((item, idx) => normalizeQuestionObject({
+                                id: 'shared_' + idx,
+                                type: typeDecode[item.y] || item.y || 'PG',
+                                question: item.q || '',
+                                options: {
+                                    A: item.a || '',
+                                    B: item.b || '',
+                                    C: item.c || '',
+                                    D: item.d || ''
+                                },
+                                answer: item.k || '',
+                                weight: Number(item.w) || undefined,
+                                explanation: item.e || '',
+                                image: item.i || ''
+                            }, idx))
+                        );
+                        document.getElementById('shared-link-banner').classList.remove('hidden');
+                    } else {
+                        useTeacherExamAsActiveStudentExam(false);
+                    }
+                } catch (err) {
+                    console.error('Gagal menguraikan link ujian:', err);
                     useTeacherExamAsActiveStudentExam(false);
-                    showToast('Link ujian tidak valid atau terpotong. Menampilkan paket soal bawaan.', 'warning');
                 }
             } else {
                 useTeacherExamAsActiveStudentExam(false);
             }
 
             renderStudentHeaderAndSummary();
-            restoreStudentProgressIfAvailable();
-            refreshLucideIcons();
 
-            if (modeParam === 'guru') {
-                openPinModal();
+            if (modeParam === 'guru' && !sharedExamParam) {
+                if (isTeacherAuthenticated) {
+                    enterTeacherPortal();
+                } else {
+                    openPinModal();
+                }
+            } else if (!sharedExamParam) {
+                restoreStudentProgressIfAvailable();
             }
+
+            refreshLucideIcons();
         };
 
         // =====================================================================
-        // PENYIMPANAN LOCALSTORAGE GURU & REKAP NILAI
+        // AUTOSAVE & RESTORE PROGRES UJIAN SISWA
         // =====================================================================
-        function loadTeacherDataFromStorage() {
-            try {
-                const savedSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
-                if (savedSettings) {
-                    teacherSettings = { ...DEFAULT_SETTINGS, ...JSON.parse(savedSettings) };
-                }
-            } catch (e) {
-                teacherSettings = { ...DEFAULT_SETTINGS };
-            }
-
-            try {
-                const savedQuestions = localStorage.getItem(STORAGE_KEYS.QUESTIONS);
-                if (savedQuestions) {
-                    const parsed = JSON.parse(savedQuestions);
-                    if (Array.isArray(parsed) && parsed.length > 0) {
-                        teacherQuestions = sortQuestionsByOfficialSection(parsed.map((q, i) => normalizeQuestionObject(q, i)));
-                    } else {
-                        teacherQuestions = buildFull40SampleQuestions();
-                        saveTeacherQuestions();
-                    }
-                } else {
-                    teacherQuestions = buildFull40SampleQuestions();
-                    saveTeacherQuestions();
-                }
-            } catch (e) {
-                teacherQuestions = buildFull40SampleQuestions();
-            }
-        }
-
-        function saveTeacherSettings() {
-            localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(teacherSettings));
-        }
-
-        function saveTeacherQuestions() {
-            teacherQuestions = sortQuestionsByOfficialSection(teacherQuestions);
-            localStorage.setItem(STORAGE_KEYS.QUESTIONS, JSON.stringify(teacherQuestions));
-        }
-
-        function loadGradebookFromStorage() {
-            try {
-                const saved = localStorage.getItem(STORAGE_KEYS.GRADEBOOK);
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    if (Array.isArray(parsed)) gradebook = parsed;
-                }
-            } catch (e) {
-                gradebook = [];
-            }
-        }
-
-        function saveGradebookToStorage() {
-            localStorage.setItem(STORAGE_KEYS.GRADEBOOK, JSON.stringify(gradebook));
-        }
-
-        // =====================================================================
-        // MODE SISWA: MUAT PAKET SOAL, LOGIN, AUTOSAVE, PENGERJAAN & HASIL
-        // =====================================================================
-        function useTeacherExamAsActiveStudentExam(fromShared = false) {
-            isLoadedFromSharedLink = fromShared;
-            activeExamSettings = { ...teacherSettings };
-            activeExamQuestions = sortQuestionsByOfficialSection(
-                teacherQuestions.map((q, idx) => normalizeQuestionObject(q, idx))
-            );
-        }
-
-        function loadExamFromSharedUrl(compressedParam) {
-            try {
-                const jsonStr = LZString.decompressFromEncodedURIComponent(compressedParam);
-                if (!jsonStr) return false;
-                const payload = JSON.parse(jsonStr);
-                if (!payload || !Array.isArray(payload.q) || payload.q.length === 0) return false;
-
-                const typeDecode = { 1: 'PG', 2: 'ISIAN', 3: 'URAIAN' };
-                activeExamSettings = {
-                    schoolName: payload.s || DEFAULT_SETTINGS.schoolName,
-                    examTitle: payload.t || DEFAULT_SETTINGS.examTitle,
-                    subject: payload.m || DEFAULT_SETTINGS.subject,
-                    teacherName: payload.g || DEFAULT_SETTINGS.teacherName,
-                    duration: Number(payload.d) || 90,
-                    showReview: payload.r === undefined ? true : Boolean(payload.r)
-                };
-
-                activeExamQuestions = sortQuestionsByOfficialSection(
-                    payload.q.map((item, idx) => {
-                        const type = typeDecode[item.y] || 'PG';
-                        return normalizeQuestionObject({
-                            id: `shared_q_${idx + 1}`,
-                            type,
-                            question: item.q || '',
-                            options: {
-                                A: item.a || '',
-                                B: item.b || '',
-                                C: item.c || '',
-                                D: item.d || ''
-                            },
-                            answer: item.k || '',
-                            weight: Number(item.w) || getDefaultWeightByType(type),
-                            explanation: item.e || '',
-                            image: item.i || ''
-                        }, idx);
-                    })
-                );
-
-                isLoadedFromSharedLink = true;
-                const banner = document.getElementById('shared-link-banner');
-                if (banner) banner.classList.remove('hidden');
-                return true;
-            } catch (e) {
-                console.error('Gagal mendekode URL ujian:', e);
-                return false;
-            }
-        }
-
-        function renderStudentHeaderAndSummary() {
-            document.getElementById('student-header-school').textContent = activeExamSettings.schoolName;
-            document.getElementById('student-header-title').textContent = activeExamSettings.examTitle;
-            document.getElementById('student-header-subject').textContent = activeExamSettings.subject;
-
-            const totalCount = activeExamQuestions.length;
-            const pgCount = activeExamQuestions.filter(q => q.type === 'PG').length;
-            const isianCount = activeExamQuestions.filter(q => q.type === 'ISIAN').length;
-            const uraianCount = activeExamQuestions.filter(q => q.type === 'URAIAN').length;
-
-            document.getElementById('student-summary-count').textContent = `${totalCount} Soal`;
-            document.getElementById('student-summary-duration').textContent = `${activeExamSettings.duration} Menit`;
-
-            document.getElementById('student-summary-breakdown').innerHTML = `
-                <div class="bg-white border border-sky-200 rounded-xl py-2 px-2">
-                    <span class="block font-extrabold text-sky-800">Bagian I: PG</span>
-                    <span class="font-bold text-slate-700">${pgCount} Soal</span>
-                </div>
-                <div class="bg-white border border-teal-200 rounded-xl py-2 px-2">
-                    <span class="block font-extrabold text-teal-800">Bagian II: Isian</span>
-                    <span class="font-bold text-slate-700">${isianCount} Soal</span>
-                </div>
-                <div class="bg-white border border-amber-200 rounded-xl py-2 px-2">
-                    <span class="block font-extrabold text-amber-800">Bagian III: Uraian</span>
-                    <span class="font-bold text-slate-700">${uraianCount} Soal</span>
-                </div>
-            `;
-        }
-
-        function getActiveExamSignature() {
-            return `${activeExamSettings.examTitle}_${activeExamQuestions.length}`;
-        }
-
         function saveStudentProgressToStorage() {
             if (!studentSession.active) return;
             try {
                 localStorage.setItem(STORAGE_KEYS.STUDENT_PROGRESS, JSON.stringify({
                     signature: getActiveExamSignature(),
                     name: studentSession.name,
+                    nis: studentSession.nis,
                     absen: studentSession.absen,
                     studentClass: studentSession.studentClass,
                     currentIndex: studentSession.currentIndex,
@@ -1682,6 +1705,7 @@
                 ) {
                     studentSession.active = true;
                     studentSession.name = saved.name || '';
+                    studentSession.nis = saved.nis || '';
                     studentSession.absen = saved.absen || '';
                     studentSession.studentClass = saved.studentClass || '5A';
                     studentSession.currentIndex = Math.min(saved.currentIndex || 0, activeExamQuestions.length - 1);
@@ -1689,13 +1713,150 @@
                     studentSession.remainingSeconds = saved.remainingSeconds;
 
                     showStudentExamScreen();
-                    showToast(`Melanjutkan sesi ujian ${studentSession.name} secara otomatis.`, 'info');
+                    showToast(`Melanjutkan sesi ujian ${studentSession.name} (NIS: ${studentSession.nis}) secara otomatis.`, 'info');
                 }
             } catch (e) {
                 clearStudentProgressStorage();
             }
         }
 
+        // =====================================================================
+        // PENGELOLAAN KUNCI NIS & IZIN UJIAN ULANG (KEWENANGAN GURU)
+        // =====================================================================
+        function normalizeNis(nis) {
+            return String(nis || '').trim().replace(/\s+/g, '').toUpperCase();
+        }
+
+        function getAttemptedNisRecords() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEYS.ATTEMPTED_NIS);
+                const parsed = raw ? JSON.parse(raw) : [];
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveAttemptedNisRecords(list) {
+            localStorage.setItem(STORAGE_KEYS.ATTEMPTED_NIS, JSON.stringify(list));
+        }
+
+        function getAllowedRetakeNisList() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEYS.ALLOWED_RETAKE_NIS);
+                const parsed = raw ? JSON.parse(raw) : [];
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveAllowedRetakeNisList(list) {
+            localStorage.setItem(STORAGE_KEYS.ALLOWED_RETAKE_NIS, JSON.stringify(list));
+        }
+
+        function recordNisExamAttempt(nis, name, studentClass) {
+            const cleanNis = normalizeNis(nis);
+            if (!cleanNis) return;
+            const sig = getActiveExamSignature();
+            const records = getAttemptedNisRecords().filter(r => !(r.nis === cleanNis && r.signature === sig));
+            records.unshift({
+                nis: cleanNis,
+                name: name || '-',
+                studentClass: studentClass || '5A',
+                signature: sig,
+                timestamp: new Date().toLocaleString('id-ID')
+            });
+            saveAttemptedNisRecords(records);
+
+            // Hapus dari daftar izin retake sekali pakai setelah siswa menggunakan kesempatan ulangnya
+            const allowed = getAllowedRetakeNisList().filter(item => item !== cleanNis);
+            saveAllowedRetakeNisList(allowed);
+        }
+
+        function hasNisAlreadyTakenExam(nis) {
+            const cleanNis = normalizeNis(nis);
+            if (!cleanNis) return false;
+
+            const isEnforcementOn = activeExamSettings.preventDuplicateNis !== false && teacherSettings.preventDuplicateNis !== false;
+            if (!isEnforcementOn) return false;
+
+            // Jika guru sudah memberikan izin khusus untuk NIS ini, perbolehkan
+            const allowed = getAllowedRetakeNisList();
+            if (allowed.includes(cleanNis)) return false;
+
+            const sig = getActiveExamSignature();
+            const attempted = getAttemptedNisRecords().some(r => r.nis === cleanNis && r.signature === sig);
+            if (attempted) return true;
+
+            // Cek juga apakah NIS sudah ada di rekap nilai lokal
+            return gradebook.some(g => normalizeNis(g.nis) === cleanNis);
+        }
+
+        // =====================================================================
+        // ANTI-CHEAT: DETEKSI PINDAH TAB, MINIMIZE & TUTUP BROWSER SAAT UJIAN
+        // =====================================================================
+        function setupStudentAntiCheatListeners() {
+            // 1. Saat siswa membuka tab lain atau minimize browser
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden && studentSession.active && !isTeacherAuthenticated) {
+                    triggerAntiCheatWarningModal('Kamu terdeteksi membuka tab lain atau mengecilkan (minimize) jendela browser saat ujian berlangsung.');
+                }
+            });
+
+            // 2. Saat jendela browser kehilangan fokus (berpindah ke aplikasi lain)
+            window.addEventListener('blur', () => {
+                if (studentSession.active && !isTeacherAuthenticated) {
+                    triggerAntiCheatWarningModal('Kamu terdeteksi berpindah ke jendela atau aplikasi lain saat ujian sedang berlangsung.');
+                }
+            });
+
+            // 3. Saat siswa mencoba menutup tab / close browser / refresh halaman
+            window.addEventListener('beforeunload', (e) => {
+                if (studentSession.active && !isTeacherAuthenticated) {
+                    e.preventDefault();
+                    e.returnValue = 'Ujian sedang berlangsung! Jika menutup browser, ujian dapat otomatis terkumpul.';
+                    return e.returnValue;
+                }
+            });
+        }
+
+        function triggerAntiCheatWarningModal(reasonText) {
+            if (!studentSession.active || isAntiCheatModalOpen) return;
+            isAntiCheatModalOpen = true;
+            const msgEl = document.getElementById('anticheat-message');
+            if (msgEl && reasonText) {
+                msgEl.textContent = `${reasonText} Apakah kamu yakin ingin langsung mengumpulkan (submit) ujian dan keluar dari portal?`;
+            }
+            const modal = document.getElementById('anticheat-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            refreshLucideIcons();
+        }
+
+        function handleAntiCheatContinue() {
+            isAntiCheatModalOpen = false;
+            const modal = document.getElementById('anticheat-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            showToast('Silakan lanjutkan ujian dengan jujur dan fokus pada layar ujian.', 'info');
+        }
+
+        function handleAntiCheatSubmitAndExit() {
+            isAntiCheatModalOpen = false;
+            const modal = document.getElementById('anticheat-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+
+            // Otomatis submit ujian agar nilai & kunci NIS tercatat, lalu keluar kembali ke halaman awal portal
+            finishStudentExam(true);
+            retakeStudentExam();
+            showToast('Ujian telah otomatis disubmit dan sesi kamu telah keluar dari portal ujian.', 'warning');
+        }
+
+        // =====================================================================
+        // MODE SISWA: LOGIN, PENGERJAAN SOAL & SUBMIT HASIL
+        // =====================================================================
         function startStudentExam(event) {
             event.preventDefault();
             if (activeExamQuestions.length === 0) {
@@ -1704,16 +1865,24 @@
             }
 
             const name = document.getElementById('stu-name').value.trim();
+            const nis = normalizeNis(document.getElementById('stu-nis').value);
             const absen = document.getElementById('stu-absen').value.trim();
             const studentClass = document.getElementById('stu-class').value.trim() || '5A';
 
-            if (!name || !absen) {
-                showToast('Harap lengkapi Nama Lengkap dan Nomor Absen terlebih dahulu.', 'warning');
+            if (!name || !nis || !absen) {
+                showToast('Harap lengkapi Nama Lengkap, Nomor Induk Siswa (NIS), dan Nomor Absen terlebih dahulu.', 'warning');
+                return;
+            }
+
+            // Validasi larangan ujian dua kali berdasarkan NIS (kecuali jika sedang pratinjau guru)
+            if (!isTeacherAuthenticated && hasNisAlreadyTakenExam(nis)) {
+                showToast(`Akses ditolak! Nomor Induk Siswa (${nis}) sudah tercatat menyelesaikan ujian dan tidak diperbolehkan mengerjakan dua kali.`, 'error');
                 return;
             }
 
             studentSession.active = true;
             studentSession.name = name;
+            studentSession.nis = nis;
             studentSession.absen = absen;
             studentSession.studentClass = studentClass;
             studentSession.currentIndex = 0;
@@ -1730,7 +1899,7 @@
             document.getElementById('student-exam-screen').classList.remove('hidden');
 
             document.getElementById('exam-bar-student').textContent =
-                `${studentSession.name} • Kelas ${studentSession.studentClass} (Absen ${studentSession.absen})`;
+                `${studentSession.name} (NIS: ${studentSession.nis}) • Kelas ${studentSession.studentClass} • Absen ${studentSession.absen}`;
 
             startStudentTimer();
             renderStudentCurrentQuestion();
@@ -1991,17 +2160,25 @@
         function checkIsianAnswerMatch(studentAns, keyPattern) {
             const cleanStu = String(studentAns || '').trim().toLowerCase().replace(/\s+/g, ' ');
             if (!cleanStu) return false;
-            const variants = String(keyPattern || '').split('|').map(v => v.trim().toLowerCase().replace(/\s+/g, ' ')).filter(Boolean);
-            return variants.includes(cleanStu);
+            const acceptedList = String(keyPattern || '')
+                .split('|')
+                .map(item => item.trim().toLowerCase().replace(/\s+/g, ' '))
+                .filter(Boolean);
+            return acceptedList.includes(cleanStu);
         }
 
-        function finishStudentExam() {
+        function finishStudentExam(isAutoExitSubmit = false) {
             if (studentSession.timerInterval) {
                 clearInterval(studentSession.timerInterval);
                 studentSession.timerInterval = null;
             }
             studentSession.active = false;
             clearStudentProgressStorage();
+
+            // Kunci NIS siswa agar tidak dapat mengikuti ujian dua kali (kecuali mode pratinjau guru)
+            if (!isTeacherAuthenticated && studentSession.nis) {
+                recordNisExamAttempt(studentSession.nis, studentSession.name, studentSession.studentClass);
+            }
 
             let pgPoints = 0;
             let maxPgPoints = 0;
@@ -2062,6 +2239,7 @@
             const tokenPayload = {
                 w: timestamp,
                 n: studentSession.name,
+                nis: studentSession.nis,
                 k: studentSession.studentClass,
                 a: studentSession.absen,
                 pg: pgPoints,
@@ -2095,6 +2273,7 @@
                 id: 'gb_local_' + Date.now(),
                 timestamp,
                 name: studentSession.name,
+                nis: studentSession.nis,
                 studentClass: studentSession.studentClass,
                 absen: studentSession.absen,
                 pgPoints,
@@ -2112,12 +2291,16 @@
                 finalScore: initFinal
             });
 
+            if (isAutoExitSubmit) {
+                return;
+            }
+
             // Tampilkan layar hasil siswa
             document.getElementById('student-exam-screen').classList.add('hidden');
             document.getElementById('student-result-screen').classList.remove('hidden');
 
             document.getElementById('res-student-identity').textContent =
-                `${studentSession.name} • Kelas ${studentSession.studentClass} • Absen ${studentSession.absen}`;
+                `${studentSession.name} • NIS: ${studentSession.nis} • Kelas ${studentSession.studentClass} • Absen ${studentSession.absen}`;
 
             if (maxUraianPoints > 0) {
                 document.getElementById('res-score-label').textContent = 'Skor Sementara (Pilihan Ganda + Isian)';
@@ -2215,6 +2398,7 @@
                 `Assalamu'alaikum / Selamat pagi Bapak/Ibu Guru,\n` +
                 `Saya telah menyelesaikan *${activeExamSettings.examTitle}*:\n\n` +
                 `• Nama: *${studentSession.name}*\n` +
+                `• Nomor Induk Siswa (NIS): *${studentSession.nis}*\n` +
                 `• Kelas / Absen: *${studentSession.studentClass} / No. ${studentSession.absen}*\n` +
                 `• Skor PG: *${s.pgPoints}/${s.maxPgPoints}* (Benar ${s.pgCorrect}/${s.pgTotal})\n` +
                 `• Skor Isian: *${s.isianPoints}/${s.maxIsianPoints}* (Benar ${s.isianCorrect}/${s.isianTotal})\n` +
@@ -2282,7 +2466,7 @@
                 enterTeacherPortal();
                 showToast('Selamat datang di Portal Guru!', 'success');
             } else {
-                showToast('PIN Guru salah. Silakan periksa kembali (default: 123456).', 'error');
+                showToast('PIN Guru salah. Silakan periksa kembali.', 'error');
                 document.getElementById('pin-input').select();
             }
         }
@@ -2350,6 +2534,7 @@
                 renderTeacherPrintSheet();
             } else if (tabKey === 'bagikan') {
                 checkEmbeddedImageWarning();
+                renderAttemptedNisManager();
             } else if (tabKey === 'rekap') {
                 renderGradebookTable();
             }
@@ -2363,6 +2548,7 @@
             renderTeacherQuestionCards();
             renderTeacherPrintSheet();
             renderGradebookTable();
+            renderAttemptedNisManager();
             checkEmbeddedImageWarning();
             refreshLucideIcons();
         }
@@ -2987,7 +3173,7 @@
         }
 
         // =====================================================================
-        // PORTAL GURU - TAB B: BAGIKAN LINK UJIAN (LZSTRING) & BACKUP .JSON
+        // PORTAL GURU - TAB B: BAGIKAN LINK UJIAN (LZSTRING), IZIN NIS & .JSON
         // =====================================================================
         function populateTeacherSettingsInputs() {
             document.getElementById('set-school').value = teacherSettings.schoolName;
@@ -2996,18 +3182,100 @@
             document.getElementById('set-teacher').value = teacherSettings.teacherName;
             document.getElementById('set-duration').value = teacherSettings.duration;
             document.getElementById('set-show-review').checked = teacherSettings.showReview;
+            const dupCheck = document.getElementById('set-prevent-duplicate-nis');
+            if (dupCheck) {
+                dupCheck.checked = teacherSettings.preventDuplicateNis !== false;
+            }
+            renderAttemptedNisManager();
         }
 
         function saveTeacherSettingsFromInputs() {
+            const dupCheck = document.getElementById('set-prevent-duplicate-nis');
             teacherSettings = {
                 schoolName: document.getElementById('set-school').value.trim() || DEFAULT_SETTINGS.schoolName,
                 examTitle: document.getElementById('set-title').value.trim() || DEFAULT_SETTINGS.examTitle,
                 subject: document.getElementById('set-subject').value.trim() || DEFAULT_SETTINGS.subject,
                 teacherName: document.getElementById('set-teacher').value.trim() || DEFAULT_SETTINGS.teacherName,
                 duration: Math.max(1, parseInt(document.getElementById('set-duration').value, 10) || 90),
-                showReview: document.getElementById('set-show-review').checked
+                showReview: document.getElementById('set-show-review').checked,
+                preventDuplicateNis: dupCheck ? dupCheck.checked : true
             };
             saveTeacherSettings();
+        }
+
+        function allowRetakeForNis(event) {
+            event.preventDefault();
+            const input = document.getElementById('guru-allow-nis-input');
+            const cleanNis = normalizeNis(input.value);
+            if (!cleanNis) {
+                showToast('Masukkan Nomor Induk Siswa (NIS) terlebih dahulu.', 'warning');
+                return;
+            }
+
+            // Hapus dari riwayat NIS terkunci & tambahkan ke whitelist retake
+            const updatedAttempted = getAttemptedNisRecords().filter(r => r.nis !== cleanNis);
+            saveAttemptedNisRecords(updatedAttempted);
+
+            const allowed = getAllowedRetakeNisList();
+            if (!allowed.includes(cleanNis)) {
+                allowed.push(cleanNis);
+                saveAllowedRetakeNisList(allowed);
+            }
+
+            input.value = '';
+            renderAttemptedNisManager();
+            refreshLucideIcons();
+            showToast(`NIS ${cleanNis} telah diizinkan untuk mengikuti ujian kembali atas kewenangan Guru.`, 'success');
+        }
+
+        function unlockSingleNis(nis) {
+            const cleanNis = normalizeNis(nis);
+            const updatedAttempted = getAttemptedNisRecords().filter(r => r.nis !== cleanNis);
+            saveAttemptedNisRecords(updatedAttempted);
+
+            const allowed = getAllowedRetakeNisList();
+            if (!allowed.includes(cleanNis)) {
+                allowed.push(cleanNis);
+                saveAllowedRetakeNisList(allowed);
+            }
+
+            renderAttemptedNisManager();
+            refreshLucideIcons();
+            showToast(`Kunci NIS ${cleanNis} dibuka. Siswa dapat mengerjakan ujian kembali.`, 'success');
+        }
+
+        function confirmResetAllAttemptedNis() {
+            showConfirmDialog(
+                'Reset Semua Kunci NIS',
+                'Semua Nomor Induk Siswa (NIS) yang sebelumnya terkunci akan diizinkan mengikuti ujian kembali. Lanjutkan?',
+                () => {
+                    saveAttemptedNisRecords([]);
+                    saveAllowedRetakeNisList([]);
+                    renderAttemptedNisManager();
+                    refreshLucideIcons();
+                    showToast('Seluruh riwayat kunci NIS berhasil direset.', 'info');
+                }
+            );
+        }
+
+        function renderAttemptedNisManager() {
+            const container = document.getElementById('guru-attempted-nis-list');
+            if (!container) return;
+            const records = getAttemptedNisRecords();
+            if (records.length === 0) {
+                container.innerHTML = `<span class="text-xs text-slate-400 italic">Belum ada NIS yang terkunci pada perangkat ini.</span>`;
+                return;
+            }
+            container.innerHTML = records.map(r => `
+                <div class="inline-flex items-center gap-2 bg-white border border-slate-300 rounded-xl px-3 py-1.5 text-xs">
+                    <span class="font-extrabold text-slate-800">${escapeHtml(r.nis)}</span>
+                    <span class="text-slate-500">(${escapeHtml(r.name)})</span>
+                    <button type="button" onclick="unlockSingleNis('${escapeHtml(r.nis)}')" title="Izinkan Ujian Ulang"
+                        class="px-2 py-0.5 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold transition">
+                        Izinkan Ulang
+                    </button>
+                </div>
+            `).join('');
         }
 
         function checkEmbeddedImageWarning() {
@@ -3037,6 +3305,7 @@
                 g: teacherSettings.teacherName,
                 d: teacherSettings.duration,
                 r: teacherSettings.showReview ? 1 : 0,
+                p: teacherSettings.preventDuplicateNis !== false ? 1 : 0,
                 q: ordered.map(item => {
                     const obj = {
                         y: typeEncode[item.type] || 1,
@@ -3384,7 +3653,8 @@
         // =====================================================================
         function addGradebookEntry(entry) {
             const isDuplicate = gradebook.some(
-                item => item.name === entry.name && item.absen === entry.absen && item.timestamp === entry.timestamp
+                item => (item.nis && entry.nis && normalizeNis(item.nis) === normalizeNis(entry.nis) && item.timestamp === entry.timestamp) ||
+                        (item.name === entry.name && item.absen === entry.absen && item.timestamp === entry.timestamp)
             );
             if (!isDuplicate) {
                 gradebook.unshift(entry);
@@ -3433,6 +3703,7 @@
                             id: 'gb_imp_' + Date.now() + '_' + importedCount,
                             timestamp: obj.w || new Date().toLocaleString('id-ID'),
                             name: String(obj.n),
+                            nis: String(obj.nis || '-'),
                             studentClass: String(obj.k || '5A'),
                             absen: String(obj.a || '-'),
                             pgPoints,
@@ -3472,7 +3743,7 @@
 
             document.getElementById('grading-modal-student').textContent = `Koreksi Uraian: ${entry.name}`;
             document.getElementById('grading-modal-meta').textContent =
-                `Kelas ${entry.studentClass} • No. Absen ${entry.absen} • Waktu Selesai: ${entry.timestamp}`;
+                `NIS: ${entry.nis || '-'} • Kelas ${entry.studentClass} • No. Absen ${entry.absen} • Waktu Selesai: ${entry.timestamp}`;
 
             const listEl = document.getElementById('grading-modal-list');
             if (!entry.uraianResponses || entry.uraianResponses.length === 0) {
@@ -3648,6 +3919,7 @@
                         <td class="py-3 px-3 font-semibold text-slate-500">${idx + 1}</td>
                         <td class="py-3 px-3">
                             <p class="font-bold text-slate-900">${escapeHtml(row.name)}</p>
+                            <p class="text-xs font-semibold text-indigo-700">NIS: ${escapeHtml(row.nis || '-')}</p>
                             <p class="text-[11px] text-slate-400">${escapeHtml(row.timestamp)}</p>
                         </td>
                         <td class="py-3 px-3 font-semibold text-slate-700">${escapeHtml(row.studentClass)} / No. ${escapeHtml(row.absen)}</td>
@@ -3688,6 +3960,7 @@
                     'No': idx + 1,
                     'Waktu Selesai': row.timestamp,
                     'Nama Siswa': row.name,
+                    'Nomor Induk Siswa (NIS)': row.nis || '-',
                     'Kelas': row.studentClass,
                     'No. Absen': row.absen,
                     'Skor PG': `${row.pgPoints} / ${row.maxPgPoints}`,
@@ -3710,6 +3983,7 @@
                 { wch: 5 },
                 { wch: 18 },
                 { wch: 26 },
+                { wch: 22 },
                 { wch: 10 },
                 { wch: 10 },
                 { wch: 14 },
