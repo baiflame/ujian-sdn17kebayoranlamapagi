@@ -233,6 +233,79 @@
     </div>
 
     <!-- ===================================================================== -->
+    <!-- MODAL PRATINJAU TABEL EXCEL (40 SOAL: 25 PG + 10 ISIAN + 5 URAIAN)   -->
+    <!-- ===================================================================== -->
+    <div id="excel-preview-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden items-center justify-center p-2 sm:p-4 no-print">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-6xl w-full max-h-[92vh] flex flex-col border border-slate-200 overflow-hidden">
+            <!-- Header Modal Pratinjau Excel -->
+            <div class="bg-gradient-to-r from-emerald-700 to-teal-700 text-white px-6 py-4 flex flex-wrap items-center justify-between gap-3 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-white/15 flex items-center justify-center">
+                        <i data-lucide="table" class="w-5 h-5 text-emerald-100"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base sm:text-lg font-extrabold">Pratinjau Susunan File Excel (40 Butir Soal = 100 Poin)</h3>
+                        <p class="text-xs text-emerald-100">Baris 1–25: Pilihan Ganda (PG) • Baris 26–35: Isian Singkat (ISIAN) • Baris 36–40: Esai/Uraian (URAIAN)</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="downloadExcelTemplate40()"
+                        class="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs sm:text-sm shadow transition flex items-center gap-1.5">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span>Download File Excel (.xlsx)</span>
+                    </button>
+                    <button type="button" onclick="closeExcelPreviewModal()" aria-label="Tutup Pratinjau"
+                        class="w-9 h-9 rounded-xl bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Keterangan Singkat Aturan Kolom -->
+            <div class="bg-emerald-50/80 border-b border-emerald-200 px-6 py-3 text-xs text-emerald-950 flex flex-wrap items-center gap-4 shrink-0">
+                <span><strong>Aturan Kolom:</strong></span>
+                <span><code class="bg-sky-100 text-sky-900 px-1.5 py-0.5 rounded font-bold">PG</code> = Isi Pilihan A–D & Kunci (A/B/C/D)</span>
+                <span><code class="bg-teal-100 text-teal-900 px-1.5 py-0.5 rounded font-bold">ISIAN</code> = Kosongkan Pilihan A–D, isi Kunci jawaban singkat</span>
+                <span><code class="bg-amber-100 text-amber-900 px-1.5 py-0.5 rounded font-bold">URAIAN</code> = Kosongkan Pilihan A–D, isi Pedoman jawaban esai</span>
+            </div>
+
+            <!-- Tabel Mirip Excel -->
+            <div class="flex-1 overflow-auto p-4 sm:p-6">
+                <div class="border border-slate-300 rounded-2xl overflow-hidden">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-emerald-700 text-white font-extrabold">
+                                <th class="py-2.5 px-2.5 border-r border-emerald-600 text-center w-10">No</th>
+                                <th class="py-2.5 px-2.5 border-r border-emerald-600 w-20">Jenis</th>
+                                <th class="py-2.5 px-3 border-r border-emerald-600 min-w-[240px]">Pertanyaan</th>
+                                <th class="py-2.5 px-2.5 border-r border-emerald-600 min-w-[110px]">Pilihan A</th>
+                                <th class="py-2.5 px-2.5 border-r border-emerald-600 min-w-[110px]">Pilihan B</th>
+                                <th class="py-2.5 px-2.5 border-r border-emerald-600 min-w-[110px]">Pilihan C</th>
+                                <th class="py-2.5 px-2.5 border-r border-emerald-600 min-w-[110px]">Pilihan D</th>
+                                <th class="py-2.5 px-3 border-r border-emerald-600 min-w-[180px]">Kunci / Pedoman Jawaban</th>
+                                <th class="py-2.5 px-2 border-r border-emerald-600 text-center w-14">Bobot</th>
+                                <th class="py-2.5 px-3 min-w-[180px]">Pembahasan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="excel-preview-tbody" class="divide-y divide-slate-200">
+                            <!-- Diisi otomatis via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Footer Modal -->
+            <div class="bg-slate-50 border-t border-slate-200 px-6 py-3.5 flex flex-wrap items-center justify-between gap-3 shrink-0">
+                <p class="text-xs text-slate-600">File <strong>.xlsx</strong> yang diunduh sudah dilengkapi sheet panduan cara pengisian untuk Guru.</p>
+                <button type="button" onclick="closeExcelPreviewModal()"
+                    class="px-5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs sm:text-sm transition">
+                    Tutup Pratinjau
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
     <!-- ANTARMUKA 1: MODE SISWA (TAMPILAN UTAMA / DEFAULT UNTUK ANAK 5 SD)    -->
     <!-- ===================================================================== -->
     <div id="student-interface" class="flex-1 flex flex-col">
@@ -394,326 +467,17 @@
                     <div class="lg:col-span-8 bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
                             <div class="flex flex-wrap items-center gap-2">
-                                <span id="exam-section-badge" class="px-3 py-1 rounded-full bg-indigo-100 text-indigo-800 text-xs font-extrabold">
-                                    Bagian I: Pilihan Ganda
-                                </span>
-                                <span id="exam-q-badge" class="px-3.5 py-1 rounded-full bg-sky-100 text-sky-800 text-xs sm:text-sm font-extrabold">
-                                    Soal Nomor 1 dari 40
-                                </span>
+                                <button type="button" onclick="openExcelPreviewModal()"
+                                    class="px-3.5 py-2.5 rounded-xl bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-300 text-xs sm:text-sm font-bold transition flex items-center gap-1.5">
+                                    <i data-lucide="table" class="w-4 h-4"></i>
+                                    <span>Lihat Contoh Tabel Excel</span>
+                                </button>
+                                <button type="button" onclick="downloadExcelTemplate40()"
+                                    class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-sm transition flex items-center gap-2">
+                                    <i data-lucide="download" class="w-4 h-4"></i>
+                                    <span>Download File Excel (.xlsx)</span>
+                                </button>
                             </div>
-                            <span id="exam-q-status" class="text-xs font-bold text-slate-400">Belum dijawab</span>
-                        </div>
-
-                        <!-- Petunjuk Khusus Bagian Soal -->
-                        <p id="exam-section-instruction" class="text-xs font-semibold text-slate-500 bg-slate-50 border border-slate-200/80 rounded-xl px-3.5 py-2 mb-4">
-                            Pilihlah salah satu jawaban A, B, C, atau D yang paling benar!
-                        </p>
-
-                        <!-- Teks Pertanyaan Besar (18px) -->
-                        <p id="exam-q-text" class="student-question-text font-semibold text-slate-900 mb-5 whitespace-pre-line">
-                            Pertanyaan akan tampil di sini...
-                        </p>
-
-                        <!-- Gambar Soal Opsional -->
-                        <div id="exam-q-image-box" class="hidden mb-6">
-                            <img id="exam-q-image" src="" alt="Gambar Pendukung Soal" onerror="this.parentElement.classList.add('hidden')"
-                                class="max-h-64 rounded-2xl border-2 border-slate-200 shadow-sm mx-auto">
-                        </div>
-
-                        <!-- Container Input Jawaban Dinamis (PG / ISIAN / URAIAN) -->
-                        <div id="exam-answer-container" class="space-y-3.5">
-                            <!-- Diisi via JavaScript sesuai jenis soal -->
-                        </div>
-
-                        <!-- Tombol Navigasi Sebelumnya / Selanjutnya -->
-                        <div class="flex items-center justify-between gap-3 pt-6 mt-7 border-t border-slate-100">
-                            <button type="button" id="exam-prev-btn" onclick="studentPrevQuestion()"
-                                class="px-5 py-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-800 font-bold text-sm sm:text-base transition flex items-center gap-2">
-                                <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                                <span>Sebelumnya</span>
-                            </button>
-
-                            <button type="button" id="exam-next-btn" onclick="studentNextQuestion()"
-                                class="px-6 py-3.5 rounded-2xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-sm sm:text-base shadow-sm transition flex items-center gap-2">
-                                <span>Selanjutnya</span>
-                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Kolom Navigasi Nomor Terkelompok 3 Bagian & Tombol Kumpulkan -->
-                    <div class="lg:col-span-4 bg-white rounded-3xl shadow-sm border border-slate-200 p-6 space-y-5">
-                        <div>
-                            <h3 class="text-base font-extrabold text-slate-800">Navigasi Nomor Soal</h3>
-                            <p class="text-xs text-slate-500 mt-0.5">Ketuk nomor untuk pindah bagian atau soal.</p>
-                        </div>
-
-                        <div id="exam-nav-grouped" class="space-y-4 max-h-[420px] overflow-y-auto pr-1">
-                            <!-- Grup Bagian I, Bagian II, Bagian III diisi via JS -->
-                        </div>
-
-                        <div class="flex items-center justify-between text-xs font-semibold text-slate-600 bg-slate-50 p-3 rounded-2xl">
-                            <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-md bg-emerald-500 inline-block"></span> Sudah dijawab</span>
-                            <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-md bg-slate-200 inline-block"></span> Belum dijawab</span>
-                        </div>
-
-                        <button type="button" onclick="confirmStudentSubmit()"
-                            class="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-base shadow-md shadow-emerald-100 transition flex items-center justify-center gap-2">
-                            <i data-lucide="send" class="w-5 h-5"></i>
-                            <span>Selesai & Kumpulkan</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 1C. LAYAR HASIL NILAI SISWA -->
-            <div id="student-result-screen" class="hidden max-w-3xl mx-auto space-y-6">
-                <div class="bg-white rounded-3xl shadow-md border border-slate-200 p-6 sm:p-10 text-center">
-                    <div class="w-20 h-20 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center mx-auto mb-4 shadow-inner">
-                        <i data-lucide="trophy" class="w-10 h-10"></i>
-                    </div>
-                    <h2 class="text-2xl sm:text-3xl font-black text-slate-900">Ujian Selesai Dikerjakan!</h2>
-                    <p id="res-student-identity" class="text-sm sm:text-base font-semibold text-slate-500 mt-1 mb-6">Budi Santoso • Kelas 5A • Absen 12</p>
-
-                    <!-- Kartu Skor Utama (Objektif + Status Uraian) -->
-                    <div class="max-w-lg mx-auto bg-gradient-to-br from-sky-50 via-blue-50 to-indigo-50 border-2 border-sky-200 rounded-3xl p-6 mb-6">
-                        <span id="res-score-label" class="text-xs font-extrabold uppercase tracking-widest text-sky-700">Skor Sementara (Pilihan Ganda + Isian)</span>
-                        <div class="flex items-baseline justify-center gap-2 my-2">
-                            <span id="res-final-score" class="text-5xl sm:text-6xl font-black text-blue-700">74</span>
-                            <span id="res-score-max-label" class="text-lg font-extrabold text-slate-500">/ 80 Poin</span>
-                        </div>
-                        <p id="res-uraian-notice" class="text-xs sm:text-sm font-bold text-amber-800 bg-amber-100/90 border border-amber-200 rounded-xl px-3.5 py-2 mt-3">
-                            Bagian III (Uraian - Maks. 20 Poin) menunggu penilaian Bapak/Ibu Guru.
-                        </p>
-                    </div>
-
-                    <!-- Rincian Per Bagian (Bagian I, Bagian II, Bagian III) -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl mx-auto mb-7 text-left">
-                        <div class="bg-sky-50 border border-sky-200 rounded-2xl p-4">
-                            <span class="block text-xs font-extrabold text-sky-800 uppercase">Bagian I: Pilihan Ganda</span>
-                            <span id="res-pg-points" class="text-xl font-black text-slate-900 mt-1 block">46 / 50 poin</span>
-                            <span id="res-pg-detail" class="text-xs font-semibold text-slate-600">Benar 23 dari 25 soal</span>
-                        </div>
-                        <div class="bg-teal-50 border border-teal-200 rounded-2xl p-4">
-                            <span class="block text-xs font-extrabold text-teal-800 uppercase">Bagian II: Isian Singkat</span>
-                            <span id="res-isian-points" class="text-xl font-black text-slate-900 mt-1 block">28 / 30 poin</span>
-                            <span id="res-isian-detail" class="text-xs font-semibold text-slate-600">Benar 9 dari 10 soal</span>
-                        </div>
-                        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4">
-                            <span class="block text-xs font-extrabold text-amber-800 uppercase">Bagian III: Uraian</span>
-                            <span id="res-uraian-points" class="text-base font-black text-amber-700 mt-1 block">Menunggu Guru</span>
-                            <span id="res-uraian-detail" class="text-xs font-semibold text-slate-600">5 jawaban uraian terkirim</span>
-                        </div>
-                    </div>
-
-                    <!-- Tombol Kirim ke WhatsApp Guru & Salin Kode Hasil -->
-                    <div class="max-w-lg mx-auto space-y-3">
-                        <button type="button" onclick="sendResultToWhatsApp()"
-                            class="w-full py-4 px-5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-base sm:text-lg shadow-lg shadow-emerald-100 transition flex items-center justify-center gap-2.5">
-                            <i data-lucide="message-circle" class="w-6 h-6"></i>
-                            <span>Kirim Hasil & Jawaban ke WhatsApp Guru</span>
-                        </button>
-
-                        <div class="flex flex-col sm:flex-row gap-2.5">
-                            <button type="button" onclick="copyStudentResultToken()"
-                                class="flex-1 py-3 px-4 rounded-2xl bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 font-bold text-sm transition flex items-center justify-center gap-2">
-                                <i data-lucide="copy" class="w-4 h-4"></i>
-                                <span>Salin Kode Hasil</span>
-                            </button>
-                            <button type="button" onclick="retakeStudentExam()"
-                                class="flex-1 py-3 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition flex items-center justify-center gap-2">
-                                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-                                <span>Siswa Lain / Kembali</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Pembahasan Jawaban Siswa (Ditampilkan jika diizinkan Guru) -->
-                <div id="res-review-section" class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8">
-                    <h3 class="text-lg font-extrabold text-slate-900 mb-4 flex items-center gap-2">
-                        <i data-lucide="list-checks" class="w-5 h-5 text-sky-600"></i>
-                        <span>Ringkasan & Pembahasan Jawaban Kamu</span>
-                    </h3>
-                    <div id="res-review-list" class="space-y-4">
-                        <!-- Diisi oleh JS -->
-                    </div>
-                </div>
-            </div>
-        </main>
-
-        <footer class="py-4 text-center text-xs text-slate-400">
-            Sistem Ujian Online Kelas 5 SD • Belajar Jujur & Semangat
-        </footer>
-    </div>
-
-    <!-- ===================================================================== -->
-    <!-- ANTARMUKA 2: PORTAL GURU (DILINDUNGI PIN & SESSION STORAGE)           -->
-    <!-- ===================================================================== -->
-    <div id="teacher-interface" class="hidden flex-1 flex flex-col bg-slate-50">
-        <!-- Header Portal Guru -->
-        <header class="bg-gradient-to-r from-indigo-700 via-blue-700 to-sky-700 text-white shadow-md sticky top-0 z-30 no-print">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-white/15 flex items-center justify-center">
-                        <i data-lucide="shield-check" class="w-6 h-6 text-amber-300"></i>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <h1 class="text-lg sm:text-xl font-extrabold tracking-tight">Portal Guru</h1>
-                            <span class="bg-amber-400 text-slate-900 text-xs font-extrabold px-2.5 py-0.5 rounded-full">Kelas 5 SD</span>
-                        </div>
-                        <p class="text-xs text-indigo-100">Paket 25 PG + 10 Isian + 5 Uraian • Cetak PDF • Koreksi Uraian & Rekap Excel</p>
-                    </div>
-                </div>
-
-                <!-- Tombol Pratinjau Siswa & Tombol Logout / Kunci Portal -->
-                <div class="flex items-center gap-2 sm:gap-2.5">
-                    <button type="button" onclick="previewStudentMode()"
-                        class="px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-white text-xs sm:text-sm font-bold transition flex items-center gap-1.5">
-                        <i data-lucide="eye" class="w-4 h-4 text-sky-200"></i>
-                        <span>Pratinjau Siswa</span>
-                    </button>
-                    <button type="button" onclick="logoutTeacherPortal()"
-                        class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-extrabold shadow-md shadow-rose-950/30 border border-rose-400/50 transition flex items-center gap-1.5">
-                        <i data-lucide="lock" class="w-4 h-4"></i>
-                        <span>Logout / Kunci Portal</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Bar Navigasi 4 Tab Lengkap Portal Guru -->
-            <div class="bg-indigo-950/30 border-t border-white/10">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex items-center gap-2 overflow-x-auto">
-                    <button type="button" onclick="switchTeacherTab('soal')" id="gtab-soal"
-                        class="guru-tab shrink-0 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-white text-indigo-800 shadow-sm">
-                        <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
-                        <span>Kelola & Upload Soal</span>
-                        <span id="guru-q-badge" class="bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-full text-xs">40</span>
-                    </button>
-                    <button type="button" onclick="switchTeacherTab('bagikan')" id="gtab-bagikan"
-                        class="guru-tab shrink-0 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 text-white/90 hover:bg-white/10">
-                        <i data-lucide="share-2" class="w-4 h-4"></i>
-                        <span>Pengaturan Ujian & Bagikan Link</span>
-                    </button>
-                    <button type="button" onclick="switchTeacherTab('cetak')" id="gtab-cetak"
-                        class="guru-tab shrink-0 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 text-white/90 hover:bg-white/10">
-                        <i data-lucide="printer" class="w-4 h-4"></i>
-                        <span>Cetak Lembar Ujian (PDF)</span>
-                    </button>
-                    <button type="button" onclick="switchTeacherTab('rekap')" id="gtab-rekap"
-                        class="guru-tab shrink-0 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 text-white/90 hover:bg-white/10">
-                        <i data-lucide="clipboard-list" class="w-4 h-4"></i>
-                        <span>Rekap Nilai & Koreksi Uraian</span>
-                        <span id="guru-rekap-badge" class="bg-white/20 text-white px-2 py-0.5 rounded-full text-xs">0</span>
-                    </button>
-                </div>
-            </div>
-        </header>
-
-        <!-- Konten Tab Portal Guru -->
-        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
-
-            <!-- =============================================================== -->
-            <!-- TAB A: UPLOAD & KELOLA SOAL (25 PG + 10 ISIAN + 5 URAIAN)       -->
-            <!-- =============================================================== -->
-            <section id="gview-soal" class="space-y-6">
-
-                <!-- DASHBOARD TARGET PAKET SOAL (25 PG + 10 ISIAN + 5 URAIAN = 100 POIN) -->
-                <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-5 sm:p-6">
-                    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-                        <div>
-                            <h2 class="text-base sm:text-lg font-extrabold text-slate-900">Dashboard Target Paket Soal Kelas 5 SD</h2>
-                            <p class="text-xs text-slate-500">Standar penilaian: 25 PG (×2 = 50 poin) + 10 Isian (×3 = 30 poin) + 5 Uraian (×4 = 20 poin) = 100 Poin.</p>
-                        </div>
-                        <button type="button" onclick="applyStandardWeights()"
-                            class="px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 text-xs font-extrabold transition flex items-center gap-1.5">
-                            <i data-lucide="scale" class="w-4 h-4"></i>
-                            <span>Terapkan Bobot Standar (2 / 3 / 4)</span>
-                        </button>
-                    </div>
-
-                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-                        <!-- Badge PG -->
-                        <div id="dash-card-pg" class="rounded-2xl border border-sky-200 bg-sky-50/70 p-4">
-                            <div class="flex items-center justify-between text-xs font-extrabold text-sky-800 mb-1">
-                                <span>Bagian I: Pilihan Ganda</span>
-                                <span id="dash-pg-pts">0 poin</span>
-                            </div>
-                            <div class="flex items-baseline gap-1.5">
-                                <span id="dash-pg-count" class="text-2xl font-black text-slate-900">0</span>
-                                <span class="text-sm font-bold text-slate-500">/ 25 soal</span>
-                            </div>
-                            <div class="w-full h-2 bg-sky-200/70 rounded-full mt-2 overflow-hidden">
-                                <div id="dash-pg-bar" class="h-full bg-sky-600 rounded-full transition-all" style="width: 0%"></div>
-                            </div>
-                        </div>
-
-                        <!-- Badge Isian -->
-                        <div id="dash-card-isian" class="rounded-2xl border border-teal-200 bg-teal-50/70 p-4">
-                            <div class="flex items-center justify-between text-xs font-extrabold text-teal-800 mb-1">
-                                <span>Bagian II: Isian Singkat</span>
-                                <span id="dash-isian-pts">0 poin</span>
-                            </div>
-                            <div class="flex items-baseline gap-1.5">
-                                <span id="dash-isian-count" class="text-2xl font-black text-slate-900">0</span>
-                                <span class="text-sm font-bold text-slate-500">/ 10 soal</span>
-                            </div>
-                            <div class="w-full h-2 bg-teal-200/70 rounded-full mt-2 overflow-hidden">
-                                <div id="dash-isian-bar" class="h-full bg-teal-600 rounded-full transition-all" style="width: 0%"></div>
-                            </div>
-                        </div>
-
-                        <!-- Badge Uraian -->
-                        <div id="dash-card-uraian" class="rounded-2xl border border-amber-200 bg-amber-50/70 p-4">
-                            <div class="flex items-center justify-between text-xs font-extrabold text-amber-800 mb-1">
-                                <span>Bagian III: Uraian</span>
-                                <span id="dash-uraian-pts">0 poin</span>
-                            </div>
-                            <div class="flex items-baseline gap-1.5">
-                                <span id="dash-uraian-count" class="text-2xl font-black text-slate-900">0</span>
-                                <span class="text-sm font-bold text-slate-500">/ 5 soal</span>
-                            </div>
-                            <div class="w-full h-2 bg-amber-200/70 rounded-full mt-2 overflow-hidden">
-                                <div id="dash-uraian-bar" class="h-full bg-amber-500 rounded-full transition-all" style="width: 0%"></div>
-                            </div>
-                        </div>
-
-                        <!-- Badge Total Bobot -->
-                        <div id="dash-card-total" class="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4">
-                            <div class="flex items-center justify-between text-xs font-extrabold text-emerald-800 mb-1">
-                                <span>Total Bobot Skor</span>
-                                <span id="dash-total-questions">0 butir</span>
-                            </div>
-                            <div class="flex items-baseline gap-1.5">
-                                <span id="dash-total-pts" class="text-2xl font-black text-emerald-700">0</span>
-                                <span class="text-sm font-bold text-slate-600">/ 100 Poin</span>
-                            </div>
-                            <p id="dash-total-status" class="text-[11px] font-bold text-emerald-700 mt-1.5">Target ideal: 100 Poin</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    
-                    <!-- Kolom Kiri: Upload File Excel & Download Template 40 Butir -->
-                    <div class="lg:col-span-7 bg-white rounded-3xl shadow-sm border border-slate-200 p-6">
-                        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
-                                    <i data-lucide="file-spreadsheet" class="w-5 h-5"></i>
-                                </div>
-                                <div>
-                                    <h2 class="text-lg font-extrabold text-slate-800">Upload Berkas Soal Excel</h2>
-                                    <p class="text-xs text-slate-500">Mendukung <strong>.xlsx</strong>, <strong>.xls</strong>, dan <strong>.csv</strong> (PG, ISIAN, URAIAN)</p>
-                                </div>
-                            </div>
-
-                            <button type="button" onclick="downloadExcelTemplate40()"
-                                class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-sm transition flex items-center gap-2">
-                                <i data-lucide="download" class="w-4 h-4"></i>
-                                <span>Download Template Excel (25 PG + 10 Isian + 5 Uraian)</span>
-                            </button>
                         </div>
 
                         <!-- Dropzone Upload Excel -->
@@ -2607,6 +2371,45 @@
         // =====================================================================
         // PORTAL GURU - TAB A: SHEETJS EXCEL TEMPLATE 40 BUTIR & IMPORT
         // =====================================================================
+        function openExcelPreviewModal() {
+            const full40 = buildFull40SampleQuestions();
+            const tbody = document.getElementById('excel-preview-tbody');
+            tbody.innerHTML = full40.map((q, idx) => {
+                let badgeClass = 'bg-sky-100 text-sky-800';
+                if (q.type === 'ISIAN') badgeClass = 'bg-teal-100 text-teal-800';
+                if (q.type === 'URAIAN') badgeClass = 'bg-amber-100 text-amber-900';
+
+                const emptyCell = '<span class="text-slate-300 italic">-</span>';
+                return `
+                    <tr class="hover:bg-slate-50 align-top">
+                        <td class="py-2 px-2.5 border-r border-slate-200 text-center font-bold text-slate-600 bg-slate-50/70">${idx + 1}</td>
+                        <td class="py-2 px-2.5 border-r border-slate-200">
+                            <span class="px-2 py-0.5 rounded font-extrabold text-[11px] ${badgeClass}">${q.type}</span>
+                        </td>
+                        <td class="py-2 px-3 border-r border-slate-200 font-medium text-slate-900">${escapeHtml(q.question)}</td>
+                        <td class="py-2 px-2.5 border-r border-slate-200 text-slate-700">${q.type === 'PG' ? escapeHtml(q.options.A) : emptyCell}</td>
+                        <td class="py-2 px-2.5 border-r border-slate-200 text-slate-700">${q.type === 'PG' ? escapeHtml(q.options.B) : emptyCell}</td>
+                        <td class="py-2 px-2.5 border-r border-slate-200 text-slate-700">${q.type === 'PG' ? escapeHtml(q.options.C) : emptyCell}</td>
+                        <td class="py-2 px-2.5 border-r border-slate-200 text-slate-700">${q.type === 'PG' ? escapeHtml(q.options.D) : emptyCell}</td>
+                        <td class="py-2 px-3 border-r border-slate-200 font-bold text-emerald-900 bg-emerald-50/40">${escapeHtml(q.answer)}</td>
+                        <td class="py-2 px-2 border-r border-slate-200 text-center font-extrabold text-slate-800">${q.weight}</td>
+                        <td class="py-2 px-3 text-slate-600">${escapeHtml(q.explanation || '')}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            const modal = document.getElementById('excel-preview-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            refreshLucideIcons();
+        }
+
+        function closeExcelPreviewModal() {
+            const modal = document.getElementById('excel-preview-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
         function downloadExcelTemplate40() {
             const full40 = buildFull40SampleQuestions();
             const rows = full40.map((q, idx) => ({
@@ -2626,20 +2429,38 @@
             worksheet['!cols'] = [
                 { wch: 5 },
                 { wch: 10 },
-                { wch: 55 },
-                { wch: 22 },
-                { wch: 22 },
-                { wch: 22 },
-                { wch: 22 },
-                { wch: 32 },
+                { wch: 58 },
+                { wch: 24 },
+                { wch: 24 },
+                { wch: 24 },
+                { wch: 24 },
+                { wch: 36 },
                 { wch: 8 },
-                { wch: 42 }
+                { wch: 45 }
+            ];
+
+            // Sheet kedua berisi panduan pengisian agar mudah dipahami Guru
+            const guideRows = [
+                { 'Bagian Soal': 'Bagian I (No. 1 - 25)', 'Kode Kolom Jenis': 'PG', 'Jumlah Soal': '25 Soal', 'Bobot per Soal': 2, 'Total Poin': 50, 'Cara Mengisi Kolom': 'Isi Pertanyaan, Pilihan A, Pilihan B, Pilihan C, Pilihan D, lalu isi Kunci dengan huruf A, B, C, atau D.' },
+                { 'Bagian Soal': 'Bagian II (No. 26 - 35)', 'Kode Kolom Jenis': 'ISIAN', 'Jumlah Soal': '10 Soal', 'Bobot per Soal': 3, 'Total Poin': 30, 'Cara Mengisi Kolom': 'Isi Pertanyaan, KOSONGKAN Pilihan A-D, lalu isi Kunci dengan jawaban singkat. Gunakan tanda | jika ada beberapa jawaban benar (contoh: 12|dua belas).' },
+                { 'Bagian Soal': 'Bagian III (No. 36 - 40)', 'Kode Kolom Jenis': 'URAIAN', 'Jumlah Soal': '5 Soal', 'Bobot per Soal': 4, 'Total Poin': 20, 'Cara Mengisi Kolom': 'Isi Pertanyaan, KOSONGKAN Pilihan A-D, lalu isi Kunci / Pedoman Jawaban sebagai acuan nilai saat Guru mengoreksi.' },
+                { 'Bagian Soal': 'TOTAL KESELURUHAN', 'Kode Kolom Jenis': '-', 'Jumlah Soal': '40 Soal', 'Bobot per Soal': '-', 'Total Poin': 100, 'Cara Mengisi Kolom': 'Jangan mengubah judul baris pertama (header) pada sheet Paket_40_Soal_SD5 agar dapat langsung diunggah ke Portal Guru.' }
+            ];
+            const guideSheet = XLSX.utils.json_to_sheet(guideRows);
+            guideSheet['!cols'] = [
+                { wch: 24 },
+                { wch: 18 },
+                { wch: 14 },
+                { wch: 16 },
+                { wch: 12 },
+                { wch: 75 }
             ];
 
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, 'Paket_40_Soal_SD5');
-            XLSX.writeFile(workbook, 'Template_Soal_40_Butir_SD5.xlsx');
-            showToast('Template_Soal_40_Butir_SD5.xlsx (25 PG + 10 Isian + 5 Uraian) berhasil diunduh!', 'success');
+            XLSX.utils.book_append_sheet(workbook, guideSheet, 'Panduan_Cara_Isi');
+            XLSX.writeFile(workbook, 'Contoh_Soal_dan_Jawaban_Kelas5_SD.xlsx');
+            showToast('File Excel asli (Contoh_Soal_dan_Jawaban_Kelas5_SD.xlsx) berhasil diunduh!', 'success');
         }
 
         function setupExcelDragAndDrop() {
