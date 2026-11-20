@@ -1029,20 +1029,21 @@
 
                         <!-- Hasil Link Utama yang Dihasilkan -->
                         <div id="generated-link-box" class="hidden space-y-3">
-                            <div class="bg-white/90 border border-indigo-200 rounded-2xl p-3.5 space-y-2">
-                                <div class="flex items-center justify-between">
+                            <div class="bg-white/95 border border-indigo-200 rounded-2xl p-4 space-y-2.5 shadow-sm">
+                                <div class="flex flex-wrap items-center justify-between gap-2">
                                     <span id="generated-link-badge" class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-700">Link Ujian Singkat (Siap Kirim ke WhatsApp)</span>
-                                    <span id="generated-link-length" class="text-xs text-emerald-700 font-extrabold"></span>
+                                    <span id="generated-link-length" class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold"></span>
                                 </div>
                                 <div class="flex gap-2">
                                     <input type="text" id="generated-link-output" readonly
-                                        class="flex-1 rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-xs sm:text-sm font-mono font-bold text-indigo-950">
+                                        class="flex-1 rounded-xl border-2 border-indigo-200 bg-indigo-50/40 px-3.5 py-2.5 text-xs sm:text-sm font-mono font-extrabold text-indigo-950">
                                     <button type="button" onclick="copyGeneratedLinkOnly()"
-                                        class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shrink-0">
+                                        class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shrink-0">
                                         Salin
                                     </button>
                                 </div>
-                                <div class="pt-1 flex justify-end">
+                                <div class="pt-1 flex flex-wrap items-center justify-between gap-2">
+                                    <span id="generated-link-hint" class="text-[11px] text-slate-500 font-medium">Aktif selama 30 hari & siap dibuka langsung dari HP siswa.</span>
                                     <a id="share-link-wa-btn" href="#" target="_blank" rel="noopener noreferrer"
                                         class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold transition shadow-sm">
                                         <i data-lucide="message-circle" class="w-4 h-4"></i>
@@ -1051,13 +1052,13 @@
                                 </div>
                             </div>
 
-                            <!-- Cadangan Link Mandiri Tanpa Server (Terpadatkan Deflate-Raw + Base64URL) -->
-                            <div id="backup-compact-link-box" class="hidden bg-slate-50/90 border border-slate-200 rounded-2xl p-3 space-y-1.5">
-                                <div class="flex items-center justify-between text-[11px]">
-                                    <span class="font-bold text-slate-600">Cadangan Link Mandiri Tanpa Server (Offline / Permanen):</span>
-                                    <span id="backup-link-length" class="text-slate-500 font-semibold"></span>
-                                </div>
-                                <div class="flex gap-2">
+                            <!-- Cadangan Link Mandiri Tanpa Server (Disembunyikan dalam lipatan agar rapi) -->
+                            <details id="backup-compact-link-box" class="hidden bg-slate-50/90 border border-slate-200 rounded-2xl p-3">
+                                <summary class="cursor-pointer text-[11px] font-bold text-slate-600 select-none flex items-center justify-between">
+                                    <span>Opsi Cadangan: Link Mandiri Tanpa Server (Jika layanan link singkat sedang sibuk)</span>
+                                    <span id="backup-link-length" class="text-slate-400 font-semibold"></span>
+                                </summary>
+                                <div class="flex gap-2 mt-2.5">
                                     <input type="text" id="backup-link-output" readonly
                                         class="flex-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-mono text-slate-600">
                                     <button type="button" onclick="copyBackupLinkOnly()"
@@ -1065,7 +1066,7 @@
                                         Salin Cadangan
                                     </button>
                                 </div>
-                            </div>
+                            </details>
                         </div>
                     </div>
 
@@ -1305,13 +1306,15 @@
         let teacherQuestions = [];
         let teacherQuestionFilter = 'ALL';
         let gradebook = [];
-        let manualImageData = '';
-        let activeGradingRowIndex = -1;
-        let isAntiCheatModalOpen = false;
 
+        // State paket ujian aktif siswa & status sesi pengerjaan
+        let isLoadedFromSharedLink = false;
         let activeExamSettings = { ...DEFAULT_SETTINGS };
         let activeExamQuestions = [];
-        let isLoadedFromSharedLink = false;
+        let isAntiCheatModalOpen = false;
+        let manualImageData = '';
+        let activeGradingRowIndex = -1;
+
         let studentSession = {
             active: false,
             name: '',
@@ -1320,115 +1323,201 @@
             studentClass: '5A',
             currentIndex: 0,
             answers: [],
-            remainingSeconds: 5400,
+            remainingSeconds: 0,
             timerInterval: null,
             lastResultToken: '',
             lastResultSummary: null
         };
 
         // =====================================================================
-        // KOMPRESI TINGKAT TINGGI (DEFLATE-RAW + BASE64URL) & SHORT-CODE RELAY
+        // KOMPRESI & DEKOMPRESI PAKET SOAL (DEFLATE-RAW BASE64URL + LZSTRING)
         // =====================================================================
-        async function compressStringToBase64Url(str) {
-            if (typeof CompressionStream !== 'undefined') {
-                try {
-                    const bytes = new TextEncoder().encode(str);
+        function uint8ArrayToBase64Url(bytes) {
+            let binary = '';
+            const chunkSize = 0x8000;
+            for (let i = 0; i < bytes.length; i += chunkSize) {
+                const slice = bytes.subarray(i, i + chunkSize);
+                binary += String.fromCharCode.apply(null, slice);
+            }
+            return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        }
+
+        function base64UrlToUint8Array(base64Url) {
+            let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            while (base64.length % 4 !== 0) {
+                base64 += '=';
+            }
+            const binary = atob(base64);
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) {
+                bytes[i] = binary.charCodeAt(i);
+            }
+            return bytes;
+        }
+
+        async function compressStringToBase64Url(rawStr) {
+            try {
+                if (typeof CompressionStream !== 'undefined') {
+                    const inputBytes = new TextEncoder().encode(rawStr);
                     const cs = new CompressionStream('deflate-raw');
                     const writer = cs.writable.getWriter();
-                    writer.write(bytes);
+                    writer.write(inputBytes);
                     writer.close();
-                    const compressedBuf = await new Response(cs.readable).arrayBuffer();
-                    const compressedBytes = new Uint8Array(compressedBuf);
-                    let binary = '';
-                    for (let i = 0; i < compressedBytes.length; i++) {
-                        binary += String.fromCharCode(compressedBytes[i]);
-                    }
-                    const b64 = btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-                    return 'z.' + b64;
-                } catch (e) {
-                    console.warn('Fallback ke LZString:', e);
+                    const compressedBuffer = await new Response(cs.readable).arrayBuffer();
+                    return 'z' + uint8ArrayToBase64Url(new Uint8Array(compressedBuffer));
                 }
+            } catch (err) {
+                console.warn('Fallback ke kompresi LZString:', err);
             }
-            return 'l.' + LZString.compressToEncodedURIComponent(str);
+            return 'l' + LZString.compressToEncodedURIComponent(rawStr);
         }
 
         async function decompressFromEncodedToken(token) {
             if (!token) return null;
-            if (token.startsWith('z.') && typeof DecompressionStream !== 'undefined') {
-                const b64 = token.slice(2).replace(/-/g, '+').replace(/_/g, '/');
-                const pad = b64.length % 4 === 0 ? '' : '='.repeat(4 - (b64.length % 4));
-                const binary = atob(b64 + pad);
-                const bytes = new Uint8Array(binary.length);
-                for (let i = 0; i < binary.length; i++) {
-                    bytes[i] = binary.charCodeAt(i);
+            try {
+                if (token.startsWith('z') && typeof DecompressionStream !== 'undefined') {
+                    const compressedBytes = base64UrlToUint8Array(token.slice(1));
+                    const ds = new DecompressionStream('deflate-raw');
+                    const writer = ds.writable.getWriter();
+                    writer.write(compressedBytes);
+                    writer.close();
+                    const decompressedBuffer = await new Response(ds.readable).arrayBuffer();
+                    return new TextDecoder().decode(decompressedBuffer);
                 }
-                const ds = new DecompressionStream('deflate-raw');
-                const writer = ds.writable.getWriter();
-                writer.write(bytes);
-                writer.close();
-                const decompressedBuf = await new Response(ds.readable).arrayBuffer();
-                return new TextDecoder().decode(decompressedBuf);
+                if (token.startsWith('l')) {
+                    return LZString.decompressFromEncodedURIComponent(token.slice(1));
+                }
+                return LZString.decompressFromEncodedURIComponent(token);
+            } catch (err) {
+                console.error('Gagal mendekompresi token soal:', err);
+                return null;
             }
-            const rawLz = token.startsWith('l.') ? token.slice(2) : token;
-            return LZString.decompressFromEncodedURIComponent(rawLz);
+        }
+
+        function firstResolvedPromise(promises) {
+            return new Promise((resolve, reject) => {
+                let pending = promises.length;
+                if (pending === 0) {
+                    reject(new Error('Tidak ada layanan tersedia'));
+                    return;
+                }
+                promises.forEach(p => {
+                    Promise.resolve(p).then(
+                        val => {
+                            if (val) {
+                                resolve(val);
+                            } else {
+                                pending--;
+                                if (pending === 0) reject(new Error('Semua layanan gagal'));
+                            }
+                        },
+                        () => {
+                            pending--;
+                            if (pending === 0) reject(new Error('Semua layanan gagal'));
+                        }
+                    );
+                });
+            });
         }
 
         async function createShortExamCodeOnline(compressedToken) {
-            // Layanan 1: Bytebin (CORS-enabled, mengembalikan kode sangat singkat)
-            try {
+            const postViaDpaste = async () => {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 4500);
-                const res = await fetch('https://bytebin.lucko.me/post', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: compressedToken,
-                    signal: controller.signal
-                });
-                clearTimeout(timeoutId);
-                if (res.ok) {
+                const timer = setTimeout(() => controller.abort(), 6000);
+                try {
+                    const formBody = new URLSearchParams({
+                        content: compressedToken,
+                        syntax: 'text',
+                        expiry_days: '30',
+                        format: 'json'
+                    });
+                    const res = await fetch('https://dpaste.org/api/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: formBody.toString(),
+                        signal: controller.signal
+                    });
+                    if (!res.ok) throw new Error('dpaste gagal');
                     const data = await res.json();
-                    if (data && data.key) {
-                        return 'b_' + data.key;
-                    }
+                    const rawUrl = data && data.url ? String(data.url).replace(/\/+$/, '') : '';
+                    const slug = rawUrl.split('/').pop();
+                    if (!slug) throw new Error('Slug kosong');
+                    return 'd_' + slug;
+                } finally {
+                    clearTimeout(timer);
                 }
-            } catch (e) {
-                console.warn('Bytebin relay tidak merespons, mencoba layanan cadangan...', e);
-            }
+            };
 
-            // Layanan 2: JSONBlob (CORS-enabled fallback)
-            try {
+            const postViaPasteRs = async () => {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 4500);
-                const res = await fetch('https://jsonblob.com/api/jsonBlob', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ d: compressedToken }),
-                    signal: controller.signal
-                });
-                clearTimeout(timeoutId);
-                if (res.ok) {
-                    const blobId = res.headers.get('x-jsonblob') || (res.headers.get('location') || '').split('/').pop();
-                    if (blobId) {
-                        return 'j_' + blobId;
-                    }
+                const timer = setTimeout(() => controller.abort(), 6000);
+                try {
+                    const res = await fetch('https://paste.rs/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain' },
+                        body: compressedToken,
+                        signal: controller.signal
+                    });
+                    if (!res.ok) throw new Error('paste.rs gagal');
+                    const text = (await res.text()).trim().replace(/\/+$/, '');
+                    const slug = text.split('/').pop();
+                    if (!slug || slug.length > 20) throw new Error('Slug paste.rs tidak valid');
+                    return 'p_' + slug;
+                } finally {
+                    clearTimeout(timer);
                 }
-            } catch (e) {
-                console.warn('JSONBlob relay tidak merespons:', e);
-            }
+            };
 
-            return null;
+            const postViaBytebin = async () => {
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), 6000);
+                try {
+                    const res = await fetch('https://bytebin.lucko.me/post', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain' },
+                        body: compressedToken,
+                        signal: controller.signal
+                    });
+                    if (!res.ok) throw new Error('bytebin gagal');
+                    const data = await res.json();
+                    if (!data || !data.key) throw new Error('Key bytebin kosong');
+                    return 'b_' + data.key;
+                } finally {
+                    clearTimeout(timer);
+                }
+            };
+
+            try {
+                return await firstResolvedPromise([
+                    postViaDpaste(),
+                    postViaPasteRs(),
+                    postViaBytebin()
+                ]);
+            } catch (err) {
+                console.warn('Semua layanan short-link gagal merespons:', err);
+                return null;
+            }
         }
 
         async function fetchCompressedTokenFromShortCode(shortCode) {
             if (!shortCode) return null;
+            if (shortCode.startsWith('d_')) {
+                const slug = shortCode.slice(2);
+                const res = await fetch(`https://dpaste.org/${encodeURIComponent(slug)}/raw`);
+                if (!res.ok) throw new Error('Kode ujian tidak ditemukan atau sudah kedaluwarsa.');
+                return (await res.text()).trim();
+            }
+            if (shortCode.startsWith('p_')) {
+                const slug = shortCode.slice(2);
+                const res = await fetch(`https://paste.rs/${encodeURIComponent(slug)}`);
+                if (!res.ok) throw new Error('Kode ujian tidak ditemukan atau sudah kedaluwarsa.');
+                return (await res.text()).trim();
+            }
             if (shortCode.startsWith('b_')) {
                 const key = shortCode.slice(2);
                 const res = await fetch(`https://bytebin.lucko.me/${encodeURIComponent(key)}`);
                 if (!res.ok) throw new Error('Kode ujian tidak ditemukan atau sudah kedaluwarsa.');
-                return await res.text();
+                return (await res.text()).trim();
             }
             if (shortCode.startsWith('j_')) {
                 const id = shortCode.slice(2);
@@ -1842,13 +1931,14 @@
 
             const params = new URLSearchParams(window.location.search);
             const shortCodeParam = params.get('k');
+            const jsonFileParam = params.get('file');
             const legacySharedParam = params.get('ujian');
             const hashParam = window.location.hash && window.location.hash.startsWith('#u=')
                 ? window.location.hash.slice(3)
                 : '';
             const modeParam = params.get('mode');
 
-            if (shortCodeParam) {
+            if (shortCodeParam || jsonFileParam) {
                 const loadingBanner = document.getElementById('shared-link-loading-banner');
                 const startBtn = document.getElementById('stu-start-btn');
                 loadingBanner.classList.remove('hidden');
@@ -1856,21 +1946,34 @@
                 refreshLucideIcons();
 
                 try {
-                    const compressedToken = await fetchCompressedTokenFromShortCode(shortCodeParam);
-                    if (!compressedToken) throw new Error('Data soal kosong.');
-                    const decompressed = await decompressFromEncodedToken(compressedToken);
-                    if (!decompressed || !applyDecompressedExamPayload(decompressed)) {
-                        throw new Error('Format paket soal tidak dikenali.');
+                    if (jsonFileParam) {
+                        const safeFile = jsonFileParam.replace(/[^a-zA-Z0-9._-]/g, '');
+                        const res = await fetch(`./${safeFile}`);
+                        if (!res.ok) throw new Error('Berkas soal JSON tidak ditemukan.');
+                        const parsed = await res.json();
+                        if (!parsed || !Array.isArray(parsed.questions)) throw new Error('Format JSON tidak valid.');
+                        isLoadedFromSharedLink = true;
+                        activeExamSettings = { ...DEFAULT_SETTINGS, ...(parsed.settings || {}) };
+                        activeExamQuestions = sortQuestionsByOfficialSection(
+                            parsed.questions.map((q, idx) => normalizeQuestionObject(q, idx))
+                        );
+                    } else {
+                        const compressedToken = await fetchCompressedTokenFromShortCode(shortCodeParam);
+                        if (!compressedToken) throw new Error('Data soal kosong.');
+                        const decompressed = await decompressFromEncodedToken(compressedToken);
+                        if (!decompressed || !applyDecompressedExamPayload(decompressed)) {
+                            throw new Error('Format paket soal tidak dikenali.');
+                        }
                     }
                     loadingBanner.classList.add('hidden');
                     document.getElementById('shared-link-banner').classList.remove('hidden');
                     if (startBtn) startBtn.disabled = false;
                 } catch (err) {
-                    console.error('Gagal mengambil paket soal dari kode singkat:', err);
+                    console.error('Gagal mengambil paket soal dari link:', err);
                     loadingBanner.classList.add('hidden');
                     document.getElementById('shared-link-error-banner').classList.remove('hidden');
                     document.getElementById('shared-link-error-text').textContent =
-                        'Tidak dapat mengambil soal dari link singkat ini (periksa internet atau gunakan Cadangan Link Mandiri dari Guru).';
+                        'Tidak dapat mengambil soal dari link ini (periksa koneksi internetmu atau minta tautan ulang kepada Bapak/Ibu Guru).';
                     useTeacherExamAsActiveStudentExam(false);
                     if (startBtn) startBtn.disabled = false;
                 }
@@ -1893,7 +1996,7 @@
 
             renderStudentHeaderAndSummary();
 
-            const hasAnyExamLink = Boolean(shortCodeParam || hashParam || legacySharedParam);
+            const hasAnyExamLink = Boolean(shortCodeParam || jsonFileParam || hashParam || legacySharedParam);
             if (modeParam === 'guru' && !hasAnyExamLink) {
                 if (isTeacherAuthenticated) {
                     enterTeacherPortal();
@@ -3633,9 +3736,10 @@
 
                     document.getElementById('generated-link-badge').textContent = 'Link Ujian Super Singkat (Siap Kirim ke WhatsApp)';
                     document.getElementById('generated-link-output').value = superShortUrl;
-                    document.getElementById('generated-link-length').textContent = `Panjang: ${superShortUrl.length} karakter`;
+                    document.getElementById('generated-link-length').textContent = `Hanya ${superShortUrl.length} karakter`;
+                    document.getElementById('generated-link-hint').textContent = 'Aktif selama 30 hari & siap dibuka langsung dari HP siswa.';
 
-                    // Tampilkan juga tautan mandiri terkompresi sebagai cadangan permanen
+                    // Tampilkan juga tautan mandiri terkompresi sebagai cadangan permanen di dalam lipatan
                     document.getElementById('backup-compact-link-box').classList.remove('hidden');
                     document.getElementById('backup-link-output').value = selfContainedUrl;
                     document.getElementById('backup-link-length').textContent = `${selfContainedUrl.length.toLocaleString('id-ID')} karakter`;
@@ -3643,6 +3747,7 @@
                     document.getElementById('generated-link-badge').textContent = 'Link Ujian Mandiri Terkompresi (Tanpa Server)';
                     document.getElementById('generated-link-output').value = selfContainedUrl;
                     document.getElementById('generated-link-length').textContent = `${selfContainedUrl.length.toLocaleString('id-ID')} karakter`;
+                    document.getElementById('generated-link-hint').textContent = 'Layanan pemendek online sedang tidak terjangkau, menggunakan tautan mandiri offline.';
                     document.getElementById('backup-compact-link-box').classList.add('hidden');
                 }
 
