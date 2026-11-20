@@ -12,7 +12,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- SheetJS untuk baca & tulis file Excel (.xlsx, .xls, .csv) -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-    <!-- LZString untuk kompresi link ujian siswa & kode hasil tanpa server -->
+    <!-- LZString sebagai cadangan kompresi kompatibilitas lama -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
 
     <style>
@@ -176,7 +176,6 @@
     <!-- ===================================================================== -->
     <div id="uraian-grading-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden items-center justify-center p-2 sm:p-4 no-print">
         <div class="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col border border-slate-200 overflow-hidden">
-            <!-- Header Modal Koreksi -->
             <div class="bg-gradient-to-r from-indigo-700 to-sky-700 text-white px-6 py-4 flex items-center justify-between gap-3 shrink-0">
                 <div>
                     <span class="text-[11px] font-extrabold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full">Panel Penilaian Guru</span>
@@ -189,7 +188,6 @@
                 </button>
             </div>
 
-            <!-- Bar Ringkasan Skor Real-Time -->
             <div class="bg-slate-50 border-b border-slate-200 px-6 py-3 grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center shrink-0">
                 <div class="bg-white border border-slate-200 rounded-xl p-2">
                     <span class="block text-[11px] font-bold text-slate-500">Bagian I (PG)</span>
@@ -209,12 +207,8 @@
                 </div>
             </div>
 
-            <!-- Daftar Soal Uraian Siswa & Pedoman Penskoran -->
-            <div id="grading-modal-list" class="flex-1 overflow-y-auto p-6 space-y-5">
-                <!-- Diisi oleh JS -->
-            </div>
+            <div id="grading-modal-list" class="flex-1 overflow-y-auto p-6 space-y-5"></div>
 
-            <!-- Footer Modal Koreksi -->
             <div class="bg-white border-t border-slate-200 px-6 py-4 flex flex-wrap items-center justify-between gap-3 shrink-0">
                 <p class="text-xs text-slate-500">Pilih skor pada setiap butir uraian, lalu klik <strong>Simpan Penilaian</strong>.</p>
                 <div class="flex items-center gap-2.5">
@@ -237,7 +231,6 @@
     <!-- ===================================================================== -->
     <div id="excel-preview-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden items-center justify-center p-2 sm:p-4 no-print">
         <div class="bg-white rounded-3xl shadow-2xl max-w-6xl w-full max-h-[92vh] flex flex-col border border-slate-200 overflow-hidden">
-            <!-- Header Modal Pratinjau Excel -->
             <div class="bg-gradient-to-r from-emerald-700 to-teal-700 text-white px-6 py-4 flex flex-wrap items-center justify-between gap-3 shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-2xl bg-white/15 flex items-center justify-center">
@@ -261,7 +254,6 @@
                 </div>
             </div>
 
-            <!-- Keterangan Singkat Aturan Kolom -->
             <div class="bg-emerald-50/80 border-b border-emerald-200 px-6 py-3 text-xs text-emerald-950 flex flex-wrap items-center gap-4 shrink-0">
                 <span><strong>Aturan Kolom:</strong></span>
                 <span><code class="bg-sky-100 text-sky-900 px-1.5 py-0.5 rounded font-bold">PG</code> = Isi Pilihan A–D & Kunci (A/B/C/D)</span>
@@ -269,7 +261,6 @@
                 <span><code class="bg-amber-100 text-amber-900 px-1.5 py-0.5 rounded font-bold">URAIAN</code> = Kosongkan Pilihan A–D, isi Pedoman jawaban esai</span>
             </div>
 
-            <!-- Tabel Mirip Excel -->
             <div class="flex-1 overflow-auto p-4 sm:p-6">
                 <div class="border border-slate-300 rounded-2xl overflow-hidden">
                     <table class="w-full text-left border-collapse text-xs">
@@ -287,14 +278,11 @@
                                 <th class="py-2.5 px-3 min-w-[180px]">Pembahasan</th>
                             </tr>
                         </thead>
-                        <tbody id="excel-preview-tbody" class="divide-y divide-slate-200">
-                            <!-- Diisi otomatis via JS -->
-                        </tbody>
+                        <tbody id="excel-preview-tbody" class="divide-y divide-slate-200"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Footer Modal -->
             <div class="bg-slate-50 border-t border-slate-200 px-6 py-3.5 flex flex-wrap items-center justify-between gap-3 shrink-0">
                 <p class="text-xs text-slate-600">File <strong>.xlsx</strong> yang diunduh sudah dilengkapi sheet panduan cara pengisian untuk Guru.</p>
                 <button type="button" onclick="closeExcelPreviewModal()"
@@ -309,7 +297,7 @@
     <!-- ANTARMUKA 1: MODE SISWA (TAMPILAN UTAMA / DEFAULT UNTUK ANAK 5 SD)    -->
     <!-- ===================================================================== -->
     <div id="student-interface" class="flex-1 flex flex-col">
-        <!-- Banner Pratinjau Guru (Muncul jika Guru menekan Pratinjau Siswa tanpa Logout) -->
+        <!-- Banner Pratinjau Guru -->
         <div id="teacher-preview-banner" class="hidden bg-indigo-950 text-white px-4 py-2.5 text-xs sm:text-sm border-b border-indigo-700 sticky top-0 z-40 no-print">
             <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-2">
                 <div class="flex items-center gap-2 font-bold">
@@ -359,6 +347,24 @@
 
             <!-- 1A. KARTU LOGIN SISWA -->
             <div id="student-login-screen" class="max-w-xl mx-auto">
+                <!-- Banner Loading Saat Mengambil Soal dari Kode Singkat -->
+                <div id="shared-link-loading-banner" class="hidden mb-4 bg-sky-50 border border-sky-200 rounded-2xl p-4 flex items-center gap-3 text-sky-900">
+                    <i data-lucide="loader-2" class="w-6 h-6 text-sky-600 shrink-0 animate-spin"></i>
+                    <div class="text-sm">
+                        <p class="font-bold">Sedang Mengambil Paket Soal Ujian dari Guru...</p>
+                        <p class="text-xs text-sky-700">Mohon tunggu sebentar hingga daftar soal tampil.</p>
+                    </div>
+                </div>
+
+                <!-- Banner Error Jika Link Singkat Gagal Dimuat -->
+                <div id="shared-link-error-banner" class="hidden mb-4 bg-rose-50 border border-rose-200 rounded-2xl p-4 flex items-start gap-3 text-rose-900">
+                    <i data-lucide="alert-circle" class="w-6 h-6 text-rose-600 shrink-0 mt-0.5"></i>
+                    <div class="text-sm">
+                        <p class="font-bold">Gagal Memuat Paket Soal dari Link Singkat</p>
+                        <p id="shared-link-error-text" class="text-xs text-rose-700 mt-0.5">Periksa koneksi internetmu atau minta tautan cadangan kepada Bapak/Ibu Guru.</p>
+                    </div>
+                </div>
+
                 <!-- Banner Info Jika Ujian Dimuat dari Link Guru -->
                 <div id="shared-link-banner" class="hidden mb-4 bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center gap-3 text-emerald-800">
                     <i data-lucide="check-circle-2" class="w-6 h-6 text-emerald-600 shrink-0"></i>
@@ -389,9 +395,7 @@
                                 <span id="student-summary-duration" class="text-xl sm:text-2xl font-black text-slate-900 mt-0.5 block">90 Menit</span>
                             </div>
                         </div>
-                        <div id="student-summary-breakdown" class="grid grid-cols-3 gap-2 text-center text-xs">
-                            <!-- Diisi oleh JS: PG, Isian, Uraian -->
-                        </div>
+                        <div id="student-summary-breakdown" class="grid grid-cols-3 gap-2 text-center text-xs"></div>
                     </div>
 
                     <!-- Form Data Siswa -->
@@ -430,7 +434,7 @@
                         </div>
 
                         <div class="pt-2">
-                            <button type="submit" class="w-full py-4 rounded-2xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-extrabold text-lg shadow-lg shadow-sky-200 transition flex items-center justify-center gap-2.5 active:scale-[0.99]">
+                            <button type="submit" id="stu-start-btn" class="w-full py-4 rounded-2xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 disabled:opacity-50 text-white font-extrabold text-lg shadow-lg shadow-sky-200 transition flex items-center justify-center gap-2.5 active:scale-[0.99]">
                                 <i data-lucide="play" class="w-5 h-5"></i>
                                 <span>Mulai Mengerjakan</span>
                             </button>
@@ -441,7 +445,6 @@
 
             <!-- 1B. LAYAR PENGERJAAN SOAL CBT SISWA -->
             <div id="student-exam-screen" class="hidden space-y-5">
-                <!-- Sticky Bar Info Siswa & Countdown Timer -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 px-4 py-3 flex flex-wrap items-center justify-between gap-3 sticky top-[72px] z-20">
                     <div class="flex items-center gap-2.5">
                         <div class="w-9 h-9 rounded-xl bg-sky-100 text-sky-700 font-extrabold flex items-center justify-center text-sm">
@@ -453,17 +456,13 @@
                         </div>
                     </div>
 
-                    <!-- Countdown Timer -->
                     <div id="exam-timer-box" class="px-4 py-2 rounded-xl bg-amber-100 text-amber-900 border border-amber-200 font-extrabold text-base flex items-center gap-2 transition-colors">
                         <i data-lucide="clock" class="w-4 h-4"></i>
                         <span id="exam-timer-display">90:00</span>
                     </div>
                 </div>
 
-                <!-- Grid Utama: Kartu Soal + Navigasi Nomor Terkelompok -->
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                    
-                    <!-- Kolom Soal & Area Jawaban Dinamis (PG / Isian / Uraian) -->
                     <div class="lg:col-span-8 bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8">
                         <div class="flex flex-wrap items-center justify-between gap-2 pb-4 mb-5 border-b border-slate-100">
                             <div class="flex flex-wrap items-center gap-2">
@@ -477,23 +476,17 @@
                             Pilihlah salah satu jawaban A, B, C, atau D yang paling benar!
                         </p>
 
-                        <!-- Teks Pertanyaan -->
                         <div id="exam-q-text" class="student-question-text font-bold text-slate-900 mb-5 whitespace-pre-line">
                             Memuat pertanyaan...
                         </div>
 
-                        <!-- Gambar Soal (Jika Ada) -->
                         <div id="exam-q-image-box" class="hidden mb-5">
                             <img id="exam-q-image" src="" alt="Gambar Pendukung Soal" onerror="this.parentElement.classList.add('hidden')"
                                 class="max-h-64 rounded-2xl border border-slate-200 shadow-sm">
                         </div>
 
-                        <!-- Area Jawaban Dinamis (Opsi A-D / Input Isian / Textarea Uraian) -->
-                        <div id="exam-answer-container" class="space-y-3 mb-8">
-                            <!-- Diisi oleh JS -->
-                        </div>
+                        <div id="exam-answer-container" class="space-y-3 mb-8"></div>
 
-                        <!-- Tombol Navigasi Sebelumnya & Selanjutnya -->
                         <div class="flex items-center justify-between gap-3 pt-5 border-t border-slate-100">
                             <button type="button" id="exam-prev-btn" onclick="studentPrevQuestion()"
                                 class="px-5 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 font-bold text-sm transition flex items-center gap-2">
@@ -509,7 +502,6 @@
                         </div>
                     </div>
 
-                    <!-- Kolom Kanan: Navigasi Nomor Soal & Tombol Kumpulkan -->
                     <div class="lg:col-span-4 bg-white rounded-3xl shadow-sm border border-slate-200 p-5 sm:p-6 space-y-5">
                         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                             <h3 class="text-sm font-extrabold text-slate-800 flex items-center gap-2">
@@ -522,9 +514,7 @@
                             </div>
                         </div>
 
-                        <div id="exam-nav-grouped" class="space-y-4 max-h-[380px] overflow-y-auto pr-1">
-                            <!-- Diisi oleh JS -->
-                        </div>
+                        <div id="exam-nav-grouped" class="space-y-4 max-h-[380px] overflow-y-auto pr-1"></div>
 
                         <div class="pt-3 border-t border-slate-100">
                             <button type="button" onclick="confirmStudentSubmit()"
@@ -546,7 +536,6 @@
                     <h2 class="text-2xl font-black text-slate-900">Ujian Berhasil Dikumpulkan!</h2>
                     <p id="res-student-identity" class="text-sm font-semibold text-slate-600 mt-1">Nama Siswa • NIS • Kelas</p>
 
-                    <!-- Kotak Skor Utama -->
                     <div class="my-6 bg-gradient-to-br from-sky-50 to-indigo-50 border border-sky-200 rounded-3xl p-6 max-w-md mx-auto">
                         <span id="res-score-label" class="block text-xs font-extrabold uppercase tracking-wider text-sky-800">Skor Sementara (Pilihan Ganda + Isian)</span>
                         <div class="flex items-baseline justify-center gap-1.5 mt-1">
@@ -558,7 +547,6 @@
                         </p>
                     </div>
 
-                    <!-- Rincian Per Bagian -->
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left mb-6">
                         <div class="p-4 rounded-2xl bg-sky-50/70 border border-sky-200">
                             <span class="text-xs font-extrabold text-sky-800 block">Bagian I: Pilihan Ganda</span>
@@ -577,7 +565,6 @@
                         </div>
                     </div>
 
-                    <!-- Tombol Kirim Hasil ke WhatsApp Guru -->
                     <div class="flex flex-col sm:flex-row gap-3 justify-center">
                         <button type="button" onclick="sendResultToWhatsApp()"
                             class="px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm shadow-md transition flex items-center justify-center gap-2">
@@ -596,15 +583,12 @@
                     </div>
                 </div>
 
-                <!-- Pembahasan Jawaban -->
                 <div id="res-review-section" class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8">
                     <h3 class="text-lg font-extrabold text-slate-900 mb-4 flex items-center gap-2">
                         <i data-lucide="book-open-check" class="w-5 h-5 text-sky-600"></i>
                         <span>Pembahasan & Kunci Jawaban</span>
                     </h3>
-                    <div id="res-review-list" class="space-y-3">
-                        <!-- Diisi oleh JS -->
-                    </div>
+                    <div id="res-review-list" class="space-y-3"></div>
                 </div>
             </div>
         </main>
@@ -614,7 +598,6 @@
     <!-- ANTARMUKA 2: PORTAL GURU (DILINDUNGI PIN & SESI LOGIN)                -->
     <!-- ===================================================================== -->
     <div id="teacher-interface" class="hidden flex-1 flex flex-col bg-slate-100/80">
-        <!-- Header Portal Guru -->
         <header class="bg-gradient-to-r from-indigo-900 via-indigo-800 to-sky-900 text-white shadow-md sticky top-0 z-30 no-print">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3.5">
                 <div class="flex flex-wrap items-center justify-between gap-3">
@@ -645,7 +628,6 @@
                     </div>
                 </div>
 
-                <!-- Navigasi Tab Portal Guru -->
                 <nav class="flex items-center gap-1.5 overflow-x-auto pt-3 mt-3 border-t border-white/15">
                     <button type="button" id="gtab-soal" onclick="switchTeacherTab('soal')"
                         class="guru-tab shrink-0 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-white text-indigo-800 shadow-sm">
@@ -673,14 +655,12 @@
             </div>
         </header>
 
-        <!-- Konten Utama Portal Guru -->
         <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
 
             <!-- =============================================================== -->
             <!-- TAB A: KELOLA & UPLOAD SOAL (EXCEL 40 BUTIR + EDITOR MANUAL)    -->
             <!-- =============================================================== -->
             <section id="gview-soal" class="space-y-6">
-                <!-- Dashboard Progres Target Paket 40 Soal (100 Poin) -->
                 <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-5 sm:p-6">
                     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
                         <div>
@@ -695,7 +675,6 @@
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-                        <!-- Bagian I: PG -->
                         <div class="p-4 rounded-2xl bg-sky-50/70 border border-sky-200">
                             <div class="flex items-center justify-between text-xs font-extrabold text-sky-900 mb-1">
                                 <span>Bagian I: Pilihan Ganda</span>
@@ -707,7 +686,6 @@
                             </div>
                         </div>
 
-                        <!-- Bagian II: Isian -->
                         <div class="p-4 rounded-2xl bg-teal-50/70 border border-teal-200">
                             <div class="flex items-center justify-between text-xs font-extrabold text-teal-900 mb-1">
                                 <span>Bagian II: Isian Singkat</span>
@@ -719,7 +697,6 @@
                             </div>
                         </div>
 
-                        <!-- Bagian III: Uraian -->
                         <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-200">
                             <div class="flex items-center justify-between text-xs font-extrabold text-amber-900 mb-1">
                                 <span>Bagian III: Uraian</span>
@@ -731,7 +708,6 @@
                             </div>
                         </div>
 
-                        <!-- Total Skor Maksimal -->
                         <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200">
                             <div class="flex items-center justify-between text-xs font-extrabold text-emerald-900 mb-1">
                                 <span>Total Paket Soal</span>
@@ -743,9 +719,7 @@
                     </div>
                 </div>
 
-                <!-- Grid Upload Excel & Form Tambah Soal Manual -->
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                    <!-- Kolom Kiri: Upload File Excel -->
                     <div class="lg:col-span-7 bg-white rounded-3xl shadow-sm border border-slate-200 p-6">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
                             <div class="flex items-center gap-2.5">
@@ -771,7 +745,6 @@
                             </div>
                         </div>
 
-                        <!-- Dropzone Upload Excel -->
                         <div id="excel-dropzone" onclick="document.getElementById('excel-file-input').click()"
                             class="border-2 border-dashed border-emerald-300 hover:border-emerald-500 bg-emerald-50/40 hover:bg-emerald-50 rounded-2xl p-6 text-center cursor-pointer transition group">
                             <input type="file" id="excel-file-input" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleExcelFileSelect(event)">
@@ -793,10 +766,8 @@
                             </div>
                         </div>
 
-                        <!-- Banner Feedback Validasi Upload -->
                         <div id="excel-validation-banner" class="hidden mt-4 rounded-2xl p-4 text-xs sm:text-sm border"></div>
 
-                        <!-- Aksi Cepat Bank Soal -->
                         <div class="mt-4 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
                             <div class="flex flex-wrap items-center gap-2">
                                 <button type="button" onclick="loadFull40SamplePackage()"
@@ -817,7 +788,6 @@
                         </div>
                     </div>
 
-                    <!-- Kolom Kanan: Form Tambah / Edit Soal Dinamis (PG / ISIAN / URAIAN) -->
                     <div class="lg:col-span-5 bg-white rounded-3xl shadow-sm border border-slate-200 p-6">
                         <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center gap-2.5">
@@ -861,7 +831,6 @@
                                     class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
                             </div>
 
-                            <!-- Lampirkan Gambar (Upload Lokal Terkompresi Canvas atau URL) -->
                             <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
                                 <div class="flex items-center justify-between mb-1.5">
                                     <label class="text-xs font-bold text-slate-700">Gambar Soal (Opsional)</label>
@@ -885,7 +854,6 @@
                                 </div>
                             </div>
 
-                            <!-- Input Khusus PG -->
                             <div id="mq-pg-fields" class="space-y-2.5">
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                     <div>
@@ -916,7 +884,6 @@
                                 </div>
                             </div>
 
-                            <!-- Input Khusus ISIAN -->
                             <div id="mq-isian-fields" class="hidden space-y-1.5">
                                 <label class="block text-xs font-bold text-slate-700">Kunci Jawaban Isian Singkat <span class="text-rose-500">*</span></label>
                                 <input type="text" id="mq-isian-key" placeholder="Contoh: Soekarno|Ir. Soekarno"
@@ -924,7 +891,6 @@
                                 <p class="text-[11px] text-slate-500">Gunakan tanda garis tegak <code class="bg-slate-100 px-1 rounded font-mono">|</code> jika ada beberapa variasi jawaban benar (tidak peka huruf besar/kecil).</p>
                             </div>
 
-                            <!-- Input Khusus URAIAN -->
                             <div id="mq-uraian-fields" class="hidden space-y-1.5">
                                 <label class="block text-xs font-bold text-slate-700">Pedoman Jawaban / Rubrik Penilaian Uraian <span class="text-rose-500">*</span></label>
                                 <textarea id="mq-uraian-key" rows="2" placeholder="Tuliskan poin-poin jawaban benar sebagai acuan koreksi guru..."
@@ -945,7 +911,6 @@
                     </div>
                 </div>
 
-                <!-- Daftar Kartu Soal Guru dengan Filter Bagian -->
                 <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6">
                     <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-100">
                         <div>
@@ -953,7 +918,6 @@
                             <p class="text-xs text-slate-500">Filter berdasarkan bagian soal, ubah urutan, edit teks/gambar, atau sesuaikan bobot tiap butir.</p>
                         </div>
 
-                        <!-- Filter Tab Bagian Soal -->
                         <div class="flex flex-wrap items-center gap-1.5 bg-slate-100 p-1 rounded-2xl">
                             <button type="button" onclick="setTeacherQuestionFilter('ALL')" id="qfilter-ALL"
                                 class="qfilter-btn px-3 py-1.5 rounded-xl text-xs font-extrabold bg-white text-slate-900 shadow-sm transition">
@@ -974,14 +938,12 @@
                         </div>
                     </div>
 
-                    <div id="guru-question-cards" class="space-y-4">
-                        <!-- Diisi oleh JS -->
-                    </div>
+                    <div id="guru-question-cards" class="space-y-4"></div>
                 </div>
             </section>
 
             <!-- =============================================================== -->
-            <!-- TAB B: PENGATURAN, BAGIKAN LINK & CADANGAN FILE .JSON           -->
+            <!-- TAB B: PENGATURAN, BAGIKAN LINK SINGKAT & CADANGAN FILE .JSON   -->
             <!-- =============================================================== -->
             <section id="gview-bagikan" class="hidden max-w-4xl mx-auto space-y-6">
                 <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8">
@@ -1029,30 +991,33 @@
                         </div>
                     </div>
 
-                    <!-- Panel Generate & Salin Link Ujian Siswa -->
+                    <!-- Panel Generate & Salin Link Singkat Ujian Siswa -->
                     <div class="bg-gradient-to-br from-indigo-50 via-sky-50 to-blue-50 border border-sky-200 rounded-3xl p-6 mb-6">
-                        <h3 class="text-base sm:text-lg font-extrabold text-slate-900 mb-1 flex items-center gap-2">
-                            <i data-lucide="link" class="w-5 h-5 text-indigo-600"></i>
-                            <span>Bagikan Link Ujian ke Siswa (Tanpa Server)</span>
-                        </h3>
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+                            <h3 class="text-base sm:text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                                <i data-lucide="link" class="w-5 h-5 text-indigo-600"></i>
+                                <span>Bagikan Link Ujian Singkat ke Siswa</span>
+                            </h3>
+                            <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-extrabold">Mode Link Ringkas Aktif</span>
+                        </div>
                         <p class="text-xs sm:text-sm text-slate-600 mb-4">
-                            Seluruh paket soal (Bagian I, II, dan III) dikompresi otomatis ke dalam tautan khusus siap kirim ke WhatsApp kelas.
+                            Otomatis menghasilkan <strong>tautan singkat (±65 karakter)</strong> yang rapi dibagikan ke grup WhatsApp kelas, lengkap dengan cadangan tautan mandiri tanpa server.
                         </p>
 
                         <!-- Catatan Jika Ada Gambar Tersemat -->
                         <div id="embedded-image-warning" class="hidden mb-4 bg-amber-50 border border-amber-300 text-amber-900 rounded-2xl p-3.5 text-xs flex items-start gap-2.5">
                             <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
                             <div>
-                                <p class="font-bold">Catatan Ukuran Link (Ada Gambar Lokal Tersemat):</p>
-                                <p class="mt-0.5">Gambar dari perangkat ikut masuk ke dalam tautan sehingga URL menjadi panjang. Untuk paket 40 soal penuh, disarankan memakai gambar berbasis URL internet agar link tetap ringkas.</p>
+                                <p class="font-bold">Catatan Gambar Tersemat:</p>
+                                <p class="mt-0.5">Gambar dari perangkat ikut dikemas dalam paket soal. Link singkat (<code class="bg-amber-100 px-1 rounded">?k=...</code>) tetap sangat pendek (±65 karakter).</p>
                             </div>
                         </div>
 
                         <div class="flex flex-col sm:flex-row gap-3 mb-4">
-                            <button type="button" onclick="generateAndCopyStudentLink()"
-                                class="flex-1 py-3.5 px-5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2">
+                            <button type="button" id="btn-generate-short-link" onclick="generateAndCopyStudentLink()"
+                                class="flex-1 py-3.5 px-5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-extrabold text-sm sm:text-base shadow-md transition flex items-center justify-center gap-2">
                                 <i data-lucide="copy" class="w-4 h-4"></i>
-                                <span>Buat & Salin Link Ujian Siswa</span>
+                                <span>Buat & Salin Link Ujian Singkat</span>
                             </button>
 
                             <button type="button" onclick="previewStudentMode()"
@@ -1062,23 +1027,44 @@
                             </button>
                         </div>
 
-                        <!-- Hasil Link yang Dihasilkan -->
-                        <div id="generated-link-box" class="hidden space-y-2.5">
-                            <div class="flex gap-2">
-                                <input type="text" id="generated-link-output" readonly
-                                    class="flex-1 rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-xs font-mono text-slate-700">
-                                <button type="button" onclick="copyGeneratedLinkOnly()"
-                                    class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold shrink-0">
-                                    Salin
-                                </button>
+                        <!-- Hasil Link Utama yang Dihasilkan -->
+                        <div id="generated-link-box" class="hidden space-y-3">
+                            <div class="bg-white/90 border border-indigo-200 rounded-2xl p-3.5 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span id="generated-link-badge" class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-700">Link Ujian Singkat (Siap Kirim ke WhatsApp)</span>
+                                    <span id="generated-link-length" class="text-xs text-emerald-700 font-extrabold"></span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <input type="text" id="generated-link-output" readonly
+                                        class="flex-1 rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2.5 text-xs sm:text-sm font-mono font-bold text-indigo-950">
+                                    <button type="button" onclick="copyGeneratedLinkOnly()"
+                                        class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shrink-0">
+                                        Salin
+                                    </button>
+                                </div>
+                                <div class="pt-1 flex justify-end">
+                                    <a id="share-link-wa-btn" href="#" target="_blank" rel="noopener noreferrer"
+                                        class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold transition shadow-sm">
+                                        <i data-lucide="message-circle" class="w-4 h-4"></i>
+                                        <span>Kirim Link Singkat ke Grup WhatsApp</span>
+                                    </a>
+                                </div>
                             </div>
-                            <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
-                                <span id="generated-link-length" class="text-slate-500 font-semibold"></span>
-                                <a id="share-link-wa-btn" href="#" target="_blank" rel="noopener noreferrer"
-                                    class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition">
-                                    <i data-lucide="message-circle" class="w-4 h-4"></i>
-                                    <span>Kirim Link ke Grup WhatsApp</span>
-                                </a>
+
+                            <!-- Cadangan Link Mandiri Tanpa Server (Terpadatkan Deflate-Raw + Base64URL) -->
+                            <div id="backup-compact-link-box" class="hidden bg-slate-50/90 border border-slate-200 rounded-2xl p-3 space-y-1.5">
+                                <div class="flex items-center justify-between text-[11px]">
+                                    <span class="font-bold text-slate-600">Cadangan Link Mandiri Tanpa Server (Offline / Permanen):</span>
+                                    <span id="backup-link-length" class="text-slate-500 font-semibold"></span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <input type="text" id="backup-link-output" readonly
+                                        class="flex-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-mono text-slate-600">
+                                    <button type="button" onclick="copyBackupLinkOnly()"
+                                        class="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-800 text-white text-[11px] font-bold shrink-0">
+                                        Salin Cadangan
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1127,7 +1113,6 @@
                             </div>
                         </label>
 
-                        <!-- Form Izinkan NIS Tertentu Ujian Kembali -->
                         <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5">
                             <h4 class="text-sm font-extrabold text-slate-800 mb-1">Berikan Izin Ujian Ulang (Kewenangan Khusus Guru)</h4>
                             <p class="text-xs text-slate-500 mb-3">Masukkan Nomor Induk Siswa (NIS) yang mengalami kendala teknis/khusus agar diperbolehkan mengikuti ujian kembali.</p>
@@ -1142,7 +1127,6 @@
                                 </button>
                             </form>
 
-                            <!-- Daftar NIS yang Sudah Mengikuti Ujian -->
                             <div class="border-t border-slate-200 pt-3">
                                 <div class="flex items-center justify-between mb-2">
                                     <span class="text-xs font-extrabold text-slate-700">Daftar NIS yang Sudah Tercatat Mengikuti Ujian:</span>
@@ -1151,9 +1135,7 @@
                                         Reset Semua Kunci NIS
                                     </button>
                                 </div>
-                                <div id="guru-attempted-nis-list" class="flex flex-wrap gap-2">
-                                    <!-- Diisi oleh JS -->
-                                </div>
+                                <div id="guru-attempted-nis-list" class="flex flex-wrap gap-2"></div>
                             </div>
                         </div>
                     </div>
@@ -1201,7 +1183,6 @@
             <!-- TAB C: CETAK LEMBAR UJIAN A4 (3 BAGIAN & KUNCI JAWABAN PDF)     -->
             <!-- =============================================================== -->
             <section id="gview-cetak" class="hidden space-y-5">
-                <!-- Bilah Kontrol Cetak (Tersembunyi saat Print) -->
                 <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-5 flex flex-wrap items-center justify-between gap-4 no-print">
                     <div>
                         <h2 class="text-lg font-extrabold text-slate-800">Pratinjau Lembar Soal Ujian (Kertas A4)</h2>
@@ -1221,17 +1202,13 @@
                     </div>
                 </div>
 
-                <!-- Area Lembar Kertas Ujian A4 -->
-                <div id="teacher-print-area" class="print-sheet-wrapper bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-10 max-w-4xl mx-auto">
-                    <!-- Diisi oleh JS -->
-                </div>
+                <div id="teacher-print-area" class="print-sheet-wrapper bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-10 max-w-4xl mx-auto"></div>
             </section>
 
             <!-- =============================================================== -->
             <!-- TAB D: REKAP NILAI SISWA, KOREKSI URAIAN & EXPORT EXCEL         -->
             <!-- =============================================================== -->
             <section id="gview-rekap" class="hidden space-y-6">
-                <!-- Kotak Impor Kode Hasil Siswa dari WhatsApp -->
                 <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6">
                     <div class="flex items-center gap-3 mb-3">
                         <div class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
@@ -1254,7 +1231,6 @@
                     </div>
                 </div>
 
-                <!-- Tabel Rekap Nilai -->
                 <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6">
                     <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-100">
                         <div>
@@ -1289,9 +1265,7 @@
                                     <th class="py-3 px-3 text-right">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="gradebook-table-body" class="divide-y divide-slate-100 text-sm">
-                                <!-- Diisi oleh JS -->
-                            </tbody>
+                            <tbody id="gradebook-table-body" class="divide-y divide-slate-100 text-sm"></tbody>
                         </table>
                     </div>
                 </div>
@@ -1300,14 +1274,12 @@
     </div>
 
     <!-- ===================================================================== -->
-    <!-- LOGIKA JAVASCRIPT LENGKAP (3 BAGIAN: PG, ISIAN, URAIAN + PIN SESSION) -->
+    <!-- LOGIKA JAVASCRIPT LENGKAP (SHORT LINK + DEFLATE-RAW + 3 BAGIAN SOAL)  -->
     <!-- ===================================================================== -->
     <script>
-        // PIN Default Portal Guru (tidak ditampilkan pada antarmuka publik)
         const DEFAULT_TEACHER_PIN = '123456';
         const AUTH_SESSION_KEY = 'sd5_teacher_auth_session_v2';
 
-        // Kunci Penyimpanan LocalStorage
         const STORAGE_KEYS = {
             SETTINGS: 'sd5_teacher_settings_v2',
             QUESTIONS: 'sd5_teacher_questions_v2',
@@ -1318,7 +1290,6 @@
             ALLOWED_RETAKE_NIS: 'sd5_allowed_retake_nis_v2'
         };
 
-        // Pengaturan Default Ulangan
         const DEFAULT_SETTINGS = {
             schoolName: 'SD NEGERI NUSANTARA 01',
             examTitle: 'Penilaian Sumatif Akhir Semester (PSAS) Kelas 5 SD',
@@ -1329,7 +1300,6 @@
             preventDuplicateNis: true
         };
 
-        // State Global Aplikasi
         let isTeacherAuthenticated = false;
         let teacherSettings = { ...DEFAULT_SETTINGS };
         let teacherQuestions = [];
@@ -1339,7 +1309,6 @@
         let activeGradingRowIndex = -1;
         let isAntiCheatModalOpen = false;
 
-        // State Aktif Ujian Siswa
         let activeExamSettings = { ...DEFAULT_SETTINGS };
         let activeExamQuestions = [];
         let isLoadedFromSharedLink = false;
@@ -1356,6 +1325,209 @@
             lastResultToken: '',
             lastResultSummary: null
         };
+
+        // =====================================================================
+        // KOMPRESI TINGKAT TINGGI (DEFLATE-RAW + BASE64URL) & SHORT-CODE RELAY
+        // =====================================================================
+        async function compressStringToBase64Url(str) {
+            if (typeof CompressionStream !== 'undefined') {
+                try {
+                    const bytes = new TextEncoder().encode(str);
+                    const cs = new CompressionStream('deflate-raw');
+                    const writer = cs.writable.getWriter();
+                    writer.write(bytes);
+                    writer.close();
+                    const compressedBuf = await new Response(cs.readable).arrayBuffer();
+                    const compressedBytes = new Uint8Array(compressedBuf);
+                    let binary = '';
+                    for (let i = 0; i < compressedBytes.length; i++) {
+                        binary += String.fromCharCode(compressedBytes[i]);
+                    }
+                    const b64 = btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+                    return 'z.' + b64;
+                } catch (e) {
+                    console.warn('Fallback ke LZString:', e);
+                }
+            }
+            return 'l.' + LZString.compressToEncodedURIComponent(str);
+        }
+
+        async function decompressFromEncodedToken(token) {
+            if (!token) return null;
+            if (token.startsWith('z.') && typeof DecompressionStream !== 'undefined') {
+                const b64 = token.slice(2).replace(/-/g, '+').replace(/_/g, '/');
+                const pad = b64.length % 4 === 0 ? '' : '='.repeat(4 - (b64.length % 4));
+                const binary = atob(b64 + pad);
+                const bytes = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++) {
+                    bytes[i] = binary.charCodeAt(i);
+                }
+                const ds = new DecompressionStream('deflate-raw');
+                const writer = ds.writable.getWriter();
+                writer.write(bytes);
+                writer.close();
+                const decompressedBuf = await new Response(ds.readable).arrayBuffer();
+                return new TextDecoder().decode(decompressedBuf);
+            }
+            const rawLz = token.startsWith('l.') ? token.slice(2) : token;
+            return LZString.decompressFromEncodedURIComponent(rawLz);
+        }
+
+        async function createShortExamCodeOnline(compressedToken) {
+            // Layanan 1: Bytebin (CORS-enabled, mengembalikan kode sangat singkat)
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 4500);
+                const res = await fetch('https://bytebin.lucko.me/post', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: compressedToken,
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.key) {
+                        return 'b_' + data.key;
+                    }
+                }
+            } catch (e) {
+                console.warn('Bytebin relay tidak merespons, mencoba layanan cadangan...', e);
+            }
+
+            // Layanan 2: JSONBlob (CORS-enabled fallback)
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 4500);
+                const res = await fetch('https://jsonblob.com/api/jsonBlob', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ d: compressedToken }),
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                if (res.ok) {
+                    const blobId = res.headers.get('x-jsonblob') || (res.headers.get('location') || '').split('/').pop();
+                    if (blobId) {
+                        return 'j_' + blobId;
+                    }
+                }
+            } catch (e) {
+                console.warn('JSONBlob relay tidak merespons:', e);
+            }
+
+            return null;
+        }
+
+        async function fetchCompressedTokenFromShortCode(shortCode) {
+            if (!shortCode) return null;
+            if (shortCode.startsWith('b_')) {
+                const key = shortCode.slice(2);
+                const res = await fetch(`https://bytebin.lucko.me/${encodeURIComponent(key)}`);
+                if (!res.ok) throw new Error('Kode ujian tidak ditemukan atau sudah kedaluwarsa.');
+                return await res.text();
+            }
+            if (shortCode.startsWith('j_')) {
+                const id = shortCode.slice(2);
+                const res = await fetch(`https://jsonblob.com/api/jsonBlob/${encodeURIComponent(id)}`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!res.ok) throw new Error('Kode ujian tidak ditemukan atau sudah kedaluwarsa.');
+                const json = await res.json();
+                return json && json.d ? json.d : null;
+            }
+            return null;
+        }
+
+        function applyDecompressedExamPayload(decompressedStr) {
+            const payload = JSON.parse(decompressedStr);
+            const typeDecode = { 1: 'PG', 2: 'ISIAN', 3: 'URAIAN' };
+
+            // Format Array Ringkas Baru: [school, title, subject, teacher, duration, showReview, preventDup, questionsArray]
+            if (Array.isArray(payload)) {
+                isLoadedFromSharedLink = true;
+                activeExamSettings = {
+                    schoolName: payload[0] || DEFAULT_SETTINGS.schoolName,
+                    examTitle: payload[1] || DEFAULT_SETTINGS.examTitle,
+                    subject: payload[2] || DEFAULT_SETTINGS.subject,
+                    teacherName: payload[3] || DEFAULT_SETTINGS.teacherName,
+                    duration: Number(payload[4]) || 90,
+                    showReview: payload[5] === undefined ? true : Boolean(payload[5]),
+                    preventDuplicateNis: payload[6] === undefined ? true : Boolean(payload[6])
+                };
+                const rawList = Array.isArray(payload[7]) ? payload[7] : [];
+                activeExamQuestions = sortQuestionsByOfficialSection(
+                    rawList.map((row, idx) => {
+                        const qType = typeDecode[row[0]] || 'PG';
+                        if (qType === 'PG') {
+                            return normalizeQuestionObject({
+                                id: 'shared_' + idx,
+                                type: 'PG',
+                                question: row[1] || '',
+                                options: {
+                                    A: row[2] || '',
+                                    B: row[3] || '',
+                                    C: row[4] || '',
+                                    D: row[5] || ''
+                                },
+                                answer: row[6] || 'A',
+                                weight: Number(row[7]) || 2,
+                                explanation: row[8] || '',
+                                image: row[9] || ''
+                            }, idx);
+                        }
+                        return normalizeQuestionObject({
+                            id: 'shared_' + idx,
+                            type: qType,
+                            question: row[1] || '',
+                            answer: row[2] || '',
+                            weight: Number(row[3]) || getDefaultWeightByType(qType),
+                            explanation: row[4] || '',
+                            image: row[5] || ''
+                        }, idx);
+                    })
+                );
+                return true;
+            }
+
+            // Format Objek Lama (?ujian=...) untuk kompatibilitas mundur
+            if (payload && typeof payload === 'object') {
+                isLoadedFromSharedLink = true;
+                activeExamSettings = {
+                    schoolName: payload.s || DEFAULT_SETTINGS.schoolName,
+                    examTitle: payload.t || DEFAULT_SETTINGS.examTitle,
+                    subject: payload.m || DEFAULT_SETTINGS.subject,
+                    teacherName: payload.g || DEFAULT_SETTINGS.teacherName,
+                    duration: Number(payload.d) || 90,
+                    showReview: payload.r === undefined ? true : Boolean(payload.r),
+                    preventDuplicateNis: payload.p === undefined ? true : Boolean(payload.p)
+                };
+                const rawList = Array.isArray(payload.q) ? payload.q : [];
+                activeExamQuestions = sortQuestionsByOfficialSection(
+                    rawList.map((item, idx) => normalizeQuestionObject({
+                        id: 'shared_' + idx,
+                        type: typeDecode[item.y] || item.y || 'PG',
+                        question: item.q || '',
+                        options: {
+                            A: item.a || '',
+                            B: item.b || '',
+                            C: item.c || '',
+                            D: item.d || ''
+                        },
+                        answer: item.k || '',
+                        weight: Number(item.w) || undefined,
+                        explanation: item.e || '',
+                        image: item.i || ''
+                    }, idx))
+                );
+                return true;
+            }
+
+            return false;
+        }
 
         // =====================================================================
         // UTILITAS UMUM: SANITASI HTML, IKON LUCIDE, TOAST & KONFIRMASI
@@ -1425,6 +1597,18 @@
         }
 
         function copyTextToClipboard(text, successMsg = 'Teks berhasil disalin!') {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast(successMsg, 'success');
+                }).catch(() => {
+                    fallbackCopyText(text, successMsg);
+                });
+            } else {
+                fallbackCopyText(text, successMsg);
+            }
+        }
+
+        function fallbackCopyText(text, successMsg) {
             const textarea = document.createElement('textarea');
             textarea.value = text;
             textarea.style.position = 'fixed';
@@ -1647,9 +1831,9 @@
         }
 
         // =====================================================================
-        // INISIALISASI HALAMAN (WINDOW ONLOAD)
+        // INISIALISASI HALAMAN (MENDUKUNG ?k=..., #u=..., & ?ujian=...)
         // =====================================================================
-        window.onload = function() {
+        window.onload = async function() {
             isTeacherAuthenticated = sessionStorage.getItem(AUTH_SESSION_KEY) === '1';
             loadTeacherDataFromStorage();
             loadGradebookFromStorage();
@@ -1657,43 +1841,44 @@
             setupStudentAntiCheatListeners();
 
             const params = new URLSearchParams(window.location.search);
-            const sharedExamParam = params.get('ujian');
+            const shortCodeParam = params.get('k');
+            const legacySharedParam = params.get('ujian');
+            const hashParam = window.location.hash && window.location.hash.startsWith('#u=')
+                ? window.location.hash.slice(3)
+                : '';
             const modeParam = params.get('mode');
 
-            if (sharedExamParam) {
+            if (shortCodeParam) {
+                const loadingBanner = document.getElementById('shared-link-loading-banner');
+                const startBtn = document.getElementById('stu-start-btn');
+                loadingBanner.classList.remove('hidden');
+                if (startBtn) startBtn.disabled = true;
+                refreshLucideIcons();
+
                 try {
-                    const decompressed = LZString.decompressFromEncodedURIComponent(sharedExamParam);
-                    if (decompressed) {
-                        const payload = JSON.parse(decompressed);
-                        isLoadedFromSharedLink = true;
-                        activeExamSettings = {
-                            schoolName: payload.s || DEFAULT_SETTINGS.schoolName,
-                            examTitle: payload.t || DEFAULT_SETTINGS.examTitle,
-                            subject: payload.m || DEFAULT_SETTINGS.subject,
-                            teacherName: payload.g || DEFAULT_SETTINGS.teacherName,
-                            duration: Number(payload.d) || 90,
-                            showReview: payload.r === undefined ? true : Boolean(payload.r),
-                            preventDuplicateNis: payload.p === undefined ? true : Boolean(payload.p)
-                        };
-                        const typeDecode = { 1: 'PG', 2: 'ISIAN', 3: 'URAIAN' };
-                        const rawList = Array.isArray(payload.q) ? payload.q : [];
-                        activeExamQuestions = sortQuestionsByOfficialSection(
-                            rawList.map((item, idx) => normalizeQuestionObject({
-                                id: 'shared_' + idx,
-                                type: typeDecode[item.y] || item.y || 'PG',
-                                question: item.q || '',
-                                options: {
-                                    A: item.a || '',
-                                    B: item.b || '',
-                                    C: item.c || '',
-                                    D: item.d || ''
-                                },
-                                answer: item.k || '',
-                                weight: Number(item.w) || undefined,
-                                explanation: item.e || '',
-                                image: item.i || ''
-                            }, idx))
-                        );
+                    const compressedToken = await fetchCompressedTokenFromShortCode(shortCodeParam);
+                    if (!compressedToken) throw new Error('Data soal kosong.');
+                    const decompressed = await decompressFromEncodedToken(compressedToken);
+                    if (!decompressed || !applyDecompressedExamPayload(decompressed)) {
+                        throw new Error('Format paket soal tidak dikenali.');
+                    }
+                    loadingBanner.classList.add('hidden');
+                    document.getElementById('shared-link-banner').classList.remove('hidden');
+                    if (startBtn) startBtn.disabled = false;
+                } catch (err) {
+                    console.error('Gagal mengambil paket soal dari kode singkat:', err);
+                    loadingBanner.classList.add('hidden');
+                    document.getElementById('shared-link-error-banner').classList.remove('hidden');
+                    document.getElementById('shared-link-error-text').textContent =
+                        'Tidak dapat mengambil soal dari link singkat ini (periksa internet atau gunakan Cadangan Link Mandiri dari Guru).';
+                    useTeacherExamAsActiveStudentExam(false);
+                    if (startBtn) startBtn.disabled = false;
+                }
+            } else if (hashParam || legacySharedParam) {
+                try {
+                    const tokenToRead = hashParam || legacySharedParam;
+                    const decompressed = await decompressFromEncodedToken(tokenToRead);
+                    if (decompressed && applyDecompressedExamPayload(decompressed)) {
                         document.getElementById('shared-link-banner').classList.remove('hidden');
                     } else {
                         useTeacherExamAsActiveStudentExam(false);
@@ -1708,13 +1893,14 @@
 
             renderStudentHeaderAndSummary();
 
-            if (modeParam === 'guru' && !sharedExamParam) {
+            const hasAnyExamLink = Boolean(shortCodeParam || hashParam || legacySharedParam);
+            if (modeParam === 'guru' && !hasAnyExamLink) {
                 if (isTeacherAuthenticated) {
                     enterTeacherPortal();
                 } else {
                     openPinModal();
                 }
-            } else if (!sharedExamParam) {
+            } else if (!hasAnyExamLink) {
                 restoreStudentProgressIfAvailable();
             }
 
@@ -1824,7 +2010,6 @@
             });
             saveAttemptedNisRecords(records);
 
-            // Hapus dari daftar izin retake sekali pakai setelah siswa menggunakan kesempatan ulangnya
             const allowed = getAllowedRetakeNisList().filter(item => item !== cleanNis);
             saveAllowedRetakeNisList(allowed);
         }
@@ -1836,7 +2021,6 @@
             const isEnforcementOn = activeExamSettings.preventDuplicateNis !== false && teacherSettings.preventDuplicateNis !== false;
             if (!isEnforcementOn) return false;
 
-            // Jika guru sudah memberikan izin khusus untuk NIS ini, perbolehkan
             const allowed = getAllowedRetakeNisList();
             if (allowed.includes(cleanNis)) return false;
 
@@ -1844,7 +2028,6 @@
             const attempted = getAttemptedNisRecords().some(r => r.nis === cleanNis && r.signature === sig);
             if (attempted) return true;
 
-            // Cek juga apakah NIS sudah ada di rekap nilai lokal
             return gradebook.some(g => normalizeNis(g.nis) === cleanNis);
         }
 
@@ -1852,21 +2035,18 @@
         // ANTI-CHEAT: DETEKSI PINDAH TAB, MINIMIZE & TUTUP BROWSER SAAT UJIAN
         // =====================================================================
         function setupStudentAntiCheatListeners() {
-            // 1. Saat siswa membuka tab lain atau minimize browser
             document.addEventListener('visibilitychange', () => {
                 if (document.hidden && studentSession.active && !isTeacherAuthenticated) {
                     triggerAntiCheatWarningModal('Kamu terdeteksi membuka tab lain atau mengecilkan (minimize) jendela browser saat ujian berlangsung.');
                 }
             });
 
-            // 2. Saat jendela browser kehilangan fokus (berpindah ke aplikasi lain)
             window.addEventListener('blur', () => {
                 if (studentSession.active && !isTeacherAuthenticated) {
                     triggerAntiCheatWarningModal('Kamu terdeteksi berpindah ke jendela atau aplikasi lain saat ujian sedang berlangsung.');
                 }
             });
 
-            // 3. Saat siswa mencoba menutup tab / close browser / refresh halaman
             window.addEventListener('beforeunload', (e) => {
                 if (studentSession.active && !isTeacherAuthenticated) {
                     e.preventDefault();
@@ -1903,7 +2083,6 @@
             modal.classList.add('hidden');
             modal.classList.remove('flex');
 
-            // Otomatis submit ujian agar nilai & kunci NIS tercatat, lalu keluar kembali ke halaman awal portal
             finishStudentExam(true);
             retakeStudentExam();
             showToast('Ujian telah otomatis disubmit dan sesi kamu telah keluar dari portal ujian.', 'warning');
@@ -1929,7 +2108,6 @@
                 return;
             }
 
-            // Validasi larangan ujian dua kali berdasarkan NIS (kecuali jika sedang pratinjau guru)
             if (!isTeacherAuthenticated && hasNisAlreadyTakenExam(nis)) {
                 showToast(`Akses ditolak! Nomor Induk Siswa (${nis}) sudah tercatat menyelesaikan ujian dan tidak diperbolehkan mengerjakan dua kali.`, 'error');
                 return;
@@ -2230,7 +2408,6 @@
             studentSession.active = false;
             clearStudentProgressStorage();
 
-            // Kunci NIS siswa agar tidak dapat mengikuti ujian dua kali (kecuali mode pratinjau guru)
             if (!isTeacherAuthenticated && studentSession.nis) {
                 recordNisExamAttempt(studentSession.nis, studentSession.name, studentSession.studentClass);
             }
@@ -2290,7 +2467,6 @@
             const totalMax = objectiveMax + maxUraianPoints;
             const timestamp = new Date().toLocaleString('id-ID');
 
-            // Buat kode terkompresi untuk dikirim via WhatsApp ke Guru
             const tokenPayload = {
                 w: timestamp,
                 n: studentSession.name,
@@ -2322,7 +2498,6 @@
                 maxUraianPoints, uraianCount: uraianResponses.length
             };
 
-            // Simpan langsung ke Rekap Nilai lokal jika dikerjakan pada perangkat yang sama
             const initFinal = totalMax > 0 ? Math.round((objectiveEarned / totalMax) * 100) : 0;
             addGradebookEntry({
                 id: 'gb_local_' + Date.now(),
@@ -2350,7 +2525,6 @@
                 return;
             }
 
-            // Tampilkan layar hasil siswa
             document.getElementById('student-exam-screen').classList.add('hidden');
             document.getElementById('student-result-screen').classList.remove('hidden');
 
@@ -2382,7 +2556,6 @@
                 ? `${uraianResponses.length} jawaban uraian terkirim`
                 : 'Paket objektif penuh';
 
-            // Pembahasan jawaban siswa
             const reviewSection = document.getElementById('res-review-section');
             const reviewList = document.getElementById('res-review-list');
             if (activeExamSettings.showReview) {
@@ -2730,7 +2903,6 @@
                 { wch: 45 }
             ];
 
-            // Sheet kedua berisi panduan pengisian agar mudah dipahami Guru
             const guideRows = [
                 { 'Bagian Soal': 'Bagian I (No. 1 - 25)', 'Kode Kolom Jenis': 'PG', 'Jumlah Soal': '25 Soal', 'Bobot per Soal': 2, 'Total Poin': 50, 'Cara Mengisi Kolom': 'Isi Pertanyaan, Pilihan A, Pilihan B, Pilihan C, Pilihan D, lalu isi Kunci dengan huruf A, B, C, atau D.' },
                 { 'Bagian Soal': 'Bagian II (No. 26 - 35)', 'Kode Kolom Jenis': 'ISIAN', 'Jumlah Soal': '10 Soal', 'Bobot per Soal': 3, 'Total Poin': 30, 'Cara Mengisi Kolom': 'Isi Pertanyaan, KOSONGKAN Pilihan A-D, lalu isi Kunci dengan jawaban singkat. Gunakan tanda | jika ada beberapa jawaban benar (contoh: 12|dua belas).' },
@@ -3254,7 +3426,6 @@
                                 </div>
                             </div>
 
-                            <!-- Tombol Reorder, Edit & Hapus -->
                             <div class="flex items-center gap-1 shrink-0">
                                 <button type="button" onclick="moveTeacherQuestion(${idx}, -1)" ${!canMoveUp ? 'disabled' : ''} title="Pindah ke Atas"
                                     class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 disabled:opacity-30 text-slate-700 flex items-center justify-center transition">
@@ -3285,7 +3456,7 @@
         }
 
         // =====================================================================
-        // PORTAL GURU - TAB B: BAGIKAN LINK UJIAN (LZSTRING), IZIN NIS & .JSON
+        // PORTAL GURU - TAB B: BAGIKAN LINK SINGKAT UJIAN, IZIN NIS & .JSON
         // =====================================================================
         function populateTeacherSettingsInputs() {
             document.getElementById('set-school').value = teacherSettings.schoolName;
@@ -3324,7 +3495,6 @@
                 return;
             }
 
-            // Hapus dari riwayat NIS terkunci & tambahkan ke whitelist retake
             const updatedAttempted = getAttemptedNisRecords().filter(r => r.nis !== cleanNis);
             saveAttemptedNisRecords(updatedAttempted);
 
@@ -3400,66 +3570,113 @@
             }
         }
 
-        function generateAndCopyStudentLink() {
+        function trimTrailingEmptyItems(arr) {
+            const copy = [...arr];
+            while (copy.length > 0 && (copy[copy.length - 1] === '' || copy[copy.length - 1] === null || copy[copy.length - 1] === undefined)) {
+                copy.pop();
+            }
+            return copy;
+        }
+
+        async function generateAndCopyStudentLink() {
             if (teacherQuestions.length === 0) {
                 showToast('Tambahkan minimal 1 soal sebelum membuat link ujian.', 'warning');
                 return;
             }
-            saveTeacherSettingsFromInputs();
 
-            const typeEncode = { PG: 1, ISIAN: 2, URAIAN: 3 };
-            const ordered = sortQuestionsByOfficialSection(teacherQuestions);
+            const btn = document.getElementById('btn-generate-short-link');
+            const originalBtnHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> <span>Membuat Link Ujian Singkat...</span>';
+            refreshLucideIcons();
 
-            const compactPayload = {
-                s: teacherSettings.schoolName,
-                t: teacherSettings.examTitle,
-                m: teacherSettings.subject,
-                g: teacherSettings.teacherName,
-                d: teacherSettings.duration,
-                r: teacherSettings.showReview ? 1 : 0,
-                p: teacherSettings.preventDuplicateNis !== false ? 1 : 0,
-                q: ordered.map(item => {
-                    const obj = {
-                        y: typeEncode[item.type] || 1,
-                        q: item.question,
-                        k: item.answer,
-                        w: item.weight
-                    };
-                    if (item.type === 'PG') {
-                        obj.a = item.options.A;
-                        obj.b = item.options.B;
-                        obj.c = item.options.C;
-                        obj.d = item.options.D;
-                    }
-                    if (item.explanation) obj.e = item.explanation;
-                    if (item.image) obj.i = item.image;
-                    return obj;
-                })
-            };
+            try {
+                saveTeacherSettingsFromInputs();
 
-            const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(compactPayload));
-            const baseUrl = window.location.href.split('?')[0];
-            const fullShareUrl = `${baseUrl}?ujian=${compressed}`;
+                const ordered = sortQuestionsByOfficialSection(teacherQuestions);
+                const includeExp = Boolean(teacherSettings.showReview);
 
-            document.getElementById('generated-link-box').classList.remove('hidden');
-            document.getElementById('generated-link-output').value = fullShareUrl;
-            document.getElementById('generated-link-length').textContent =
-                `Panjang tautan: ${fullShareUrl.length.toLocaleString('id-ID')} karakter (${ordered.length} butir soal)`;
+                const compactArray = [
+                    teacherSettings.schoolName,
+                    teacherSettings.examTitle,
+                    teacherSettings.subject,
+                    teacherSettings.teacherName,
+                    teacherSettings.duration,
+                    includeExp ? 1 : 0,
+                    teacherSettings.preventDuplicateNis !== false ? 1 : 0,
+                    ordered.map(item => {
+                        const exp = includeExp ? (item.explanation || '') : '';
+                        const img = item.image || '';
+                        if (item.type === 'PG') {
+                            return trimTrailingEmptyItems([1, item.question, item.options.A, item.options.B, item.options.C, item.options.D, item.answer, item.weight, exp, img]);
+                        } else if (item.type === 'ISIAN') {
+                            return trimTrailingEmptyItems([2, item.question, item.answer, item.weight, exp, img]);
+                        } else {
+                            return trimTrailingEmptyItems([3, item.question, item.answer, item.weight, exp, img]);
+                        }
+                    })
+                ];
 
-            const waMessage =
-                `Assalamu'alaikum / Selamat pagi,\n` +
-                `Berikut link *${teacherSettings.examTitle}* (${teacherSettings.subject}) untuk siswa Kelas 5 SD:\n\n` +
-                `${fullShareUrl}\n\n` +
-                `Silakan dikerjakan dengan jujur dan teliti. Terima kasih.`;
-            document.getElementById('share-link-wa-btn').href = `https://wa.me/?text=${encodeURIComponent(waMessage)}`;
+                const compressedToken = await compressStringToBase64Url(JSON.stringify(compactArray));
+                const baseUrl = window.location.href.split('?')[0].split('#')[0];
+                const selfContainedUrl = `${baseUrl}#u=${compressedToken}`;
 
-            copyTextToClipboard(fullShareUrl, 'Link ujian siswa (PG + Isian + Uraian) berhasil dibuat & disalin!');
+                // Coba buat link super singkat (?k=...) via layanan relay bebas CORS
+                const shortCode = await createShortExamCodeOnline(compressedToken);
+
+                document.getElementById('generated-link-box').classList.remove('hidden');
+
+                let primaryUrlToShare = selfContainedUrl;
+                if (shortCode) {
+                    const superShortUrl = `${baseUrl}?k=${shortCode}`;
+                    primaryUrlToShare = superShortUrl;
+
+                    document.getElementById('generated-link-badge').textContent = 'Link Ujian Super Singkat (Siap Kirim ke WhatsApp)';
+                    document.getElementById('generated-link-output').value = superShortUrl;
+                    document.getElementById('generated-link-length').textContent = `Panjang: ${superShortUrl.length} karakter`;
+
+                    // Tampilkan juga tautan mandiri terkompresi sebagai cadangan permanen
+                    document.getElementById('backup-compact-link-box').classList.remove('hidden');
+                    document.getElementById('backup-link-output').value = selfContainedUrl;
+                    document.getElementById('backup-link-length').textContent = `${selfContainedUrl.length.toLocaleString('id-ID')} karakter`;
+                } else {
+                    document.getElementById('generated-link-badge').textContent = 'Link Ujian Mandiri Terkompresi (Tanpa Server)';
+                    document.getElementById('generated-link-output').value = selfContainedUrl;
+                    document.getElementById('generated-link-length').textContent = `${selfContainedUrl.length.toLocaleString('id-ID')} karakter`;
+                    document.getElementById('backup-compact-link-box').classList.add('hidden');
+                }
+
+                const waMessage =
+                    `Assalamu'alaikum / Selamat pagi,\n` +
+                    `Berikut link *${teacherSettings.examTitle}* (${teacherSettings.subject}) untuk siswa Kelas 5 SD:\n\n` +
+                    `${primaryUrlToShare}\n\n` +
+                    `Silakan dikerjakan dengan jujur dan teliti. Terima kasih.`;
+                document.getElementById('share-link-wa-btn').href = `https://wa.me/?text=${encodeURIComponent(waMessage)}`;
+
+                copyTextToClipboard(
+                    primaryUrlToShare,
+                    shortCode
+                        ? `Link ujian singkat (${primaryUrlToShare.length} karakter) berhasil dibuat & disalin!`
+                        : 'Link ujian terkompresi berhasil dibuat & disalin!'
+                );
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalBtnHtml;
+                refreshLucideIcons();
+            }
         }
 
         function copyGeneratedLinkOnly() {
             const val = document.getElementById('generated-link-output').value;
             if (val) {
-                copyTextToClipboard(val, 'Link ujian disalin!');
+                copyTextToClipboard(val, 'Link ujian singkat berhasil disalin!');
+            }
+        }
+
+        function copyBackupLinkOnly() {
+            const val = document.getElementById('backup-link-output').value;
+            if (val) {
+                copyTextToClipboard(val, 'Cadangan link mandiri berhasil disalin!');
             }
         }
 
@@ -3533,7 +3750,6 @@
 
             let bodySectionsHtml = '';
 
-            // BAGIAN I: PILIHAN GANDA
             if (pgItems.length > 0) {
                 const pgHtml = pgItems.map(q => {
                     globalNumber++;
@@ -3569,7 +3785,6 @@
                 `;
             }
 
-            // BAGIAN II: ISIAN SINGKAT
             if (isianItems.length > 0) {
                 const isianHtml = isianItems.map(q => {
                     globalNumber++;
@@ -3603,7 +3818,6 @@
                 `;
             }
 
-            // BAGIAN III: URAIAN
             if (uraianItems.length > 0) {
                 const uraianHtml = uraianItems.map(q => {
                     globalNumber++;
@@ -3639,7 +3853,6 @@
                 `;
             }
 
-            // HALAMAN KUNCI JAWABAN & PEDOMAN PENSKORAN TERPISAH
             let keyPageHtml = '';
             if (includeKeyPage) {
                 const pgPts = pgItems.reduce((a, b) => a + b.weight, 0);
@@ -3728,14 +3941,12 @@
             }
 
             area.innerHTML = `
-                <!-- Kop Resmi Sekolah Dasar -->
                 <div class="border-b-4 border-double border-black pb-3 mb-4 text-center text-black">
                     <h1 class="text-lg sm:text-xl font-extrabold uppercase tracking-wide">${escapeHtml(teacherSettings.schoolName)}</h1>
                     <h2 class="text-base sm:text-lg font-bold uppercase">${escapeHtml(teacherSettings.examTitle)}</h2>
                     <p class="text-xs mt-0.5">Tahun Pelajaran 2026/2027</p>
                 </div>
 
-                <!-- Kotak Identitas Siswa -->
                 <table class="w-full text-xs sm:text-sm text-black border border-black mb-5 border-collapse">
                     <tr>
                         <td class="border border-black px-3 py-1.5 w-1/2"><strong>Mata Pelajaran:</strong> ${escapeHtml(teacherSettings.subject)}</td>
@@ -3750,12 +3961,10 @@
                     </tr>
                 </table>
 
-                <!-- Daftar Soal 3 Bagian -->
                 <div>
                     ${bodySectionsHtml}
                 </div>
 
-                <!-- Halaman Kunci Jawaban Terpisah -->
                 ${keyPageHtml}
             `;
         }
